@@ -1,31 +1,44 @@
 # Lista zadań
 
-## 1. Konfiguracja repozytorium i środowiska [W trakcie]
-- [x] Utworzenie struktury katalogów projektu
-- [x] Konfiguracja środowiska Node.js
-- [x] Inicjalizacja projektu Vue 3
-- [ ] Konfiguracja środowiska Python (venv)
-- [ ] Instalacja PostgreSQL
+## 1. Backend
+### Autentykacja i autoryzacja
+- [ ] Implementacja systemu logowania
+- [ ] Zarządzanie uprawnieniami (admin/user)
+- [ ] JWT tokens
 
-## 2. Frontend (Vue.js) [W trakcie]
-- [x] Utworzenie projektu Vue.js
-- [x] Konfiguracja podstawowych narzędzi (ESLint, Prettier)
-- [ ] Konfiguracja routingu
-- [ ] Utworzenie podstawowego layoutu
-- [ ] Implementacja pierwszego komponentu
-- [ ] Konfiguracja połączenia z API
+### Zarządzanie pracownikami
+- [ ] CRUD dla pracowników
+- [ ] Walidacja danych pracowników
+- [ ] Synchronizacja z czytnikami
 
-## 3. Backend (FastAPI) [Planowane]
-- [ ] Inicjalizacja projektu FastAPI
-- [ ] Konfiguracja połączenia z bazą danych
-- [ ] Utworzenie podstawowych modeli
-- [ ] Implementacja pierwszego endpointu testowego
-- [ ] Konfiguracja CORS
+### Zarządzanie czytnikami
+- [ ] CRUD dla czytników
+- [ ] Testowanie połączenia
+- [ ] Synchronizacja czasu
+- [ ] Pobieranie logów obecności
 
-## 4. Baza danych [Planowane]
-- [ ] Zaprojektowanie schematu bazy danych
-- [ ] Utworzenie migracji
-- [ ] Utworzenie podstawowych tabel
+### Logi obecności
+- [ ] Pobieranie logów z czytników
+- [ ] Zapisywanie w bazie danych
+- [ ] Filtrowanie i eksport danych
 
-## Następne kroki
-*(będą uzupełniane w miarę postępu prac)* 
+## 2. Frontend
+### Autentykacja
+- [ ] Ekran logowania
+- [ ] Obsługa sesji użytkownika
+
+### Panel pracowników
+- [ ] Lista pracowników
+- [ ] Formularz dodawania/edycji
+- [ ] Filtrowanie i wyszukiwanie
+
+### Panel czytników
+- [ ] Lista czytników
+- [ ] Formularz dodawania/edycji
+- [ ] Status połączenia
+- [ ] Przyciski akcji (połącz, synchronizuj, pobierz logi)
+
+### Panel obecności
+- [ ] Tabela z logami
+- [ ] Filtrowanie (data, pracownik, czytnik)
+- [ ] Eksport danych
