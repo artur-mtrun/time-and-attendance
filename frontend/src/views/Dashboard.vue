@@ -1,44 +1,85 @@
 <template>
-  <div class="min-h-screen bg-gray-100">
-    <nav class="bg-white shadow">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-          <div class="flex items-center">
-            <h1 class="text-xl font-semibold">Dashboard</h1>
+  <div class="bg-white shadow rounded-lg">
+    <div class="px-4 py-5 sm:p-6">
+      <h2 class="text-lg font-medium text-gray-900 mb-6">
+        Witaj, {{ authStore.user?.username }}!
+      </h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Kafelek Użytkownicy -->
+        <router-link to="/users" class="block">
+          <div class="border rounded-lg p-6 hover:shadow-lg transition-shadow bg-white hover:bg-gray-50">
+            <div class="flex items-center">
+              <div class="flex-shrink-0 bg-blue-500 rounded-md p-3">
+                <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+              </div>
+              <div class="ml-4">
+                <h3 class="text-lg font-medium text-gray-900">Użytkownicy</h3>
+                <p class="mt-1 text-sm text-gray-500">Zarządzaj użytkownikami systemu</p>
+              </div>
+            </div>
           </div>
-          <div class="flex items-center">
-            <span class="mr-4">{{ user?.username }}</span>
-            <button
-              @click="handleLogout"
-              class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-            >
-              Wyloguj
-            </button>
-          </div>
-        </div>
-      </div>
-    </nav>
+        </router-link>
 
-    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-      <div class="px-4 py-6 sm:px-0">
-        <h2 class="text-2xl font-bold mb-4">Witaj, {{ user?.username }}!</h2>
-        <!-- Tutaj dodaj zawartość dashboardu -->
+        <!-- Kafelek Czytniki (na przyszłość) -->
+        <router-link to="/terminals" class="block">
+          <div class="border rounded-lg p-6 hover:shadow-lg transition-shadow bg-white hover:bg-gray-50">
+            <div class="flex items-center">
+              <div class="flex-shrink-0 bg-green-500 rounded-md p-3">
+                <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                </svg>
+              </div>
+              <div class="ml-4">
+                <h3 class="text-lg font-medium text-gray-900">Czytniki</h3>
+                <p class="mt-1 text-sm text-gray-500">Zarządzaj czytnikami RCP</p>
+              </div>
+            </div>
+          </div>
+        </router-link>
+
+        <!-- Kafelek Obecności (na przyszłość) -->
+        <router-link to="/attendance" class="block">
+          <div class="border rounded-lg p-6 hover:shadow-lg transition-shadow bg-white hover:bg-gray-50">
+            <div class="flex items-center">
+              <div class="flex-shrink-0 bg-purple-500 rounded-md p-3">
+                <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div class="ml-4">
+                <h3 class="text-lg font-medium text-gray-900">Obecności</h3>
+                <p class="mt-1 text-sm text-gray-500">Przeglądaj raporty obecności</p>
+              </div>
+            </div>
+          </div>
+        </router-link>
+
+        <!-- Kafelek Pracownicy (na przyszłość) -->
+        <router-link to="/employees" class="block">
+          <div class="border rounded-lg p-6 hover:shadow-lg transition-shadow bg-white hover:bg-gray-50">
+            <div class="flex items-center">
+              <div class="flex-shrink-0 bg-yellow-500 rounded-md p-3">
+                <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
+              <div class="ml-4">
+                <h3 class="text-lg font-medium text-gray-900">Pracownicy</h3>
+                <p class="mt-1 text-sm text-gray-500">Zarządzaj pracownikami</p>
+              </div>
+            </div>
+          </div>
+        </router-link>
       </div>
-    </main>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from '@/stores/auth'
-import { storeToRefs } from 'pinia'
-import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth';
 
-const router = useRouter()
-const authStore = useAuthStore()
-const { user } = storeToRefs(authStore)
-
-const handleLogout = () => {
-  authStore.logout()
-  router.push('/login')
-}
+const authStore = useAuthStore();
 </script> 

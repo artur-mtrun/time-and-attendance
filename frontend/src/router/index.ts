@@ -1,14 +1,14 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { authService } from '@/services/auth';
 import LoginForm from '@/components/LoginForm.vue';
-import UsersList from '@/components/UsersList.vue';
+import MainHeader from '@/layouts/MainHeader.vue';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     routes: [
         {
             path: '/',
-            redirect: '/login'
+            redirect: '/dashboard'
         },
         {
             path: '/login',
@@ -17,16 +17,36 @@ const router = createRouter({
             meta: { requiresAuth: false }
         },
         {
-            path: '/dashboard',
-            name: 'dashboard',
-            component: () => import('../views/Dashboard.vue'),
-            meta: { requiresAuth: true }
-        },
-        {
-            path: '/users',
-            name: 'users',
-            component: UsersList,
-            meta: { requiresAuth: true }
+            path: '/',
+            component: MainHeader,
+            meta: { requiresAuth: true },
+            children: [
+                {
+                    path: 'dashboard',
+                    name: 'dashboard',
+                    component: () => import('@/views/Dashboard.vue')
+                },
+                {
+                    path: 'users',
+                    name: 'users',
+                    component: () => import('@/components/UsersList.vue')
+                },
+                {
+                    path: 'terminals',
+                    name: 'terminals',
+                    component: () => import('@/components/TerminalsList.vue')
+                },
+                {
+                    path: 'employees',
+                    name: 'employees',
+                    component: () => import('@/components/EmployeesList.vue')
+                },
+                {
+                    path: 'attendance',
+                    name: 'attendance',
+                    component: () => import('@/components/AttendanceList.vue')
+                }
+            ]
         }
     ]
 });
