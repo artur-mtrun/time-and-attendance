@@ -22,6 +22,7 @@
             <table class="min-w-full">
                 <thead>
                     <tr class="bg-gray-50">
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nr</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nazwa</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">IP</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Port</th>
@@ -32,6 +33,7 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     <tr v-for="terminal in terminalsStore.terminals" :key="terminal.id">
+                        <td class="px-6 py-4 whitespace-nowrap">{{ terminal.number }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">{{ terminal.name }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">{{ terminal.ip_address }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">{{ terminal.port }}</td>
@@ -76,6 +78,15 @@
                     {{ editedTerminal ? 'Edytuj czytnik' : 'Dodaj czytnik' }}
                 </h3>
                 <form @submit.prevent="handleSubmit">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700">Numer czytnika</label>
+                        <input
+                            v-model.number="formData.number"
+                            type="number"
+                            required
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        />
+                    </div>
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700">Nazwa</label>
                         <input
@@ -171,6 +182,7 @@ const terminalToDelete = ref<Terminal | null>(null);
 const syncingTerminal = ref<number | null>(null);
 
 const formData = ref({
+    number: 0,
     name: '',
     ip_address: '',
     port: 4370,
@@ -184,6 +196,7 @@ onMounted(() => {
 function editTerminal(terminal: Terminal) {
     editedTerminal.value = terminal;
     formData.value = {
+        number: terminal.number,
         name: terminal.name,
         ip_address: terminal.ip_address,
         port: terminal.port,
@@ -216,6 +229,7 @@ function closeModal() {
     showCreateModal.value = false;
     editedTerminal.value = null;
     formData.value = {
+        number: 0,
         name: '',
         ip_address: '',
         port: 4370,

@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import type { AttendanceLog, AttendanceFilter } from '@/types/attendance';
-import { attendanceService } from '@/services/attendance';
+import type { AttendanceLog, AttendanceFilter } from '@/types/attendance.js';
+import { attendanceService } from '@/services/attendance.js';
 
 export const useAttendanceStore = defineStore('attendance', () => {
     const attendanceLogs = ref<AttendanceLog[]>([]);

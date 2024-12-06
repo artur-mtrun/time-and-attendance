@@ -1,5 +1,5 @@
-import axios from '../plugins/axios';
-import type { AttendanceLog, AttendanceFilter } from '@/types/attendance';
+import axios from '../plugins/axios.js';
+import type { AttendanceLog, AttendanceFilter } from '../types/attendance.ts';
 
 export const attendanceService = {
     async getAttendanceLogs(filter: AttendanceFilter): Promise<AttendanceLog[]> {

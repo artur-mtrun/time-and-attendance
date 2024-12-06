@@ -1,5 +1,6 @@
 export interface Terminal {
     id: number;
+    number: number;
     name: string;
     ip_address: string;
     port: number;
@@ -10,6 +11,7 @@ export interface Terminal {
 }
 
 export interface CreateTerminalData {
+    number: number;
     name: string;
     ip_address: string;
     port: number;

@@ -3,6 +3,7 @@ from typing import Optional
 from datetime import datetime
 
 class TerminalBase(BaseModel):
+    number: int
     name: str
     ip_address: str
     port: int = 4370
@@ -12,6 +13,7 @@ class TerminalCreate(TerminalBase):
     pass
 
 class TerminalUpdate(BaseModel):
+    number: Optional[int] = None
     name: Optional[str] = None
     ip_address: Optional[str] = None
     port: Optional[int] = None
