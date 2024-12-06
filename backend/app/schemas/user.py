@@ -1,10 +1,19 @@
 from pydantic import BaseModel
 from datetime import datetime
 
-class UserResponse(BaseModel):
-    id: int
+class UserBase(BaseModel):
     username: str
-    is_admin: bool
+    is_admin: bool = False
+
+class UserCreate(UserBase):
+    password: str
+
+class UserUpdate(BaseModel):
+    password: str | None = None
+    is_admin: bool | None = None
+
+class UserResponse(UserBase):
+    id: int
     created_at: datetime
     updated_at: datetime
 
