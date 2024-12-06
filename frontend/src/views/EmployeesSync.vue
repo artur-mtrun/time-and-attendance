@@ -127,6 +127,58 @@
                 </div>
             </div>
         </div>
+
+        <div v-if="showSyncDialog" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white rounded-lg shadow-xl p-6 max-w-2xl w-full mx-4">
+                <h2 class="text-xl font-bold mb-4">Potwierdzenie synchronizacji</h2>
+                
+                <div v-if="syncData">
+                    <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4">
+                        {{ syncData.message }}
+                        <ul class="mt-2 list-disc list-inside">
+                            <li>Nowi pracownicy: {{ syncData.summary.new_employees }}</li>
+                            <li>Zmodyfikowani pracownicy: {{ syncData.summary.modified_employees }}</li>
+                            <li>W czytniku: {{ syncData.summary.total_in_reader }}</li>
+                            <li>W bazie: {{ syncData.summary.total_in_db }}</li>
+                        </ul>
+                    </div>
+
+                    <div v-if="syncData.to_add.length > 0" class="mb-4">
+                        <h3 class="font-semibold mb-2">Nowi pracownicy do dodania:</h3>
+                        <ul class="list-disc list-inside">
+                            <li v-for="emp in syncData.to_add" :key="emp.enroll_number">
+                                {{ emp.name }} ({{ emp.enroll_number }})
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div v-if="syncData.to_update.length > 0">
+                        <h3 class="font-semibold mb-2">Pracownicy do aktualizacji:</h3>
+                        <ul class="list-disc list-inside">
+                            <li v-for="emp in syncData.to_update" :key="emp.enroll_number">
+                                {{ emp.old.name }} → {{ emp.new.name }} ({{ emp.enroll_number }})
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-4 mt-6">
+                    <button 
+                        @click="showSyncDialog = false"
+                        class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
+                    >
+                        Anuluj
+                    </button>
+                    <button 
+                        @click="confirmSync"
+                        :disabled="isFetching"
+                        class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                    >
+                        {{ isFetching ? 'Zapisywanie...' : 'Zatwierdź zmiany' }}
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -146,6 +198,8 @@ const isFetching = ref(false);
 const isSending = ref(false);
 const alertMessage = ref('');
 const alertType = ref<'success' | 'error'>('success');
+const syncData = ref<any>(null);
+const showSyncDialog = ref(false);
 
 // Załaduj dane przy montowaniu komponentu
 onMounted(async () => {
@@ -200,17 +254,29 @@ function toggleAllEmployees(event: Event) {
 }
 
 async function handleSyncFromMain() {
-    isFetching.value = true;
-    alertMessage.value = '';
-    
     try {
-        await employeeService.syncFromMainTerminal();
-        await employeesStore.fetchEmployees();
-        alertMessage.value = 'Pomyślnie pobrano pracowników z terminala wzorcowego';
-        alertType.value = 'success';
-    } catch (error: any) {
-        console.error('Błąd synchronizacji:', error);
-        alertMessage.value = error.response?.data?.detail || 'Wystąpił błąd podczas pobierania pracowników';
+        isFetching.value = true;
+        console.log('Rozpoczynam synchronizację');
+        const result = await employeeService.checkSync();
+        console.log('Otrzymane dane:', result);
+        console.log('Struktura danych:', {
+            message: result.message,
+            summary: result.summary,
+            to_add: result.to_add?.length,
+            to_update: result.to_update?.length
+        });
+        
+        // Tutaj powinien pojawić się dialog z różnicami
+        // Dodaj wyświetlanie danych
+        syncData.value = result;
+        showSyncDialog.value = true;
+        
+        console.log('Dialog powinien być widoczny:', showSyncDialog.value);
+        console.log('Dane synchronizacji:', syncData.value);
+        
+    } catch (error) {
+        console.error('Błąd:', error);
+        alertMessage.value = 'Wystąpił błąd podczas synchronizacji';
         alertType.value = 'error';
     } finally {
         isFetching.value = false;
@@ -232,6 +298,23 @@ async function sendToTerminals() {
         // TODO: Dodaj obsługę błędów (np. wyświetlenie komunikatu)
     } finally {
         isSending.value = false;
+    }
+}
+
+async function confirmSync() {
+    try {
+        isFetching.value = true;
+        await employeeService.confirmSync();
+        showSyncDialog.value = false;
+        alertMessage.value = 'Pomyślnie zsynchronizowano dane';
+        alertType.value = 'success';
+        await employeesStore.fetchEmployees(); // Odśwież listę pracowników
+    } catch (error) {
+        console.error('Błąd podczas zatwierdzania synchronizacji:', error);
+        alertMessage.value = 'Wystąpił błąd podczas zatwierdzania zmian';
+        alertType.value = 'error';
+    } finally {
+        isFetching.value = false;
     }
 }
 </script> 
