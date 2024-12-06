@@ -7,5 +7,7 @@ class AttendanceLog(Base, TimestampMixin):
     id = Column(Integer, primary_key=True, index=True)
     employee_id = Column(Integer, ForeignKey("employees.id"))
     terminal_id = Column(Integer, ForeignKey("terminals.id"))
-    timestamp = Column(DateTime, nullable=False)
-    event_type = Column(String(10), nullable=False)  # 'IN' lub 'OUT' 
+    event_timestamp = Column(DateTime, nullable=False)
+    in_out_mode = Column(Integer, nullable=False)
+    verify_mode = Column(Integer, nullable=False)
+    work_code = Column(Integer, nullable=False)

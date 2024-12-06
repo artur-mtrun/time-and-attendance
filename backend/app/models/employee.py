@@ -6,7 +6,8 @@ class Employee(Base, TimestampMixin):
 
     id = Column(Integer, primary_key=True, index=True)
     enroll_number = Column(String(50), unique=True, nullable=False, index=True)
-    first_name = Column(String(50), nullable=False)
-    last_name = Column(String(50), nullable=False)
+    name = Column(String(100), nullable=False)
+    password = Column(String(4), nullable=True)
     card_number = Column(String(50))
+    privileges = Column(Integer, default=0)
     is_active = Column(Boolean, default=True) 
