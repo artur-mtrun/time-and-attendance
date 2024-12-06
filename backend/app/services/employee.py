@@ -47,3 +47,40 @@ class EmployeeService:
             db.commit()
             return True
         return False 
+
+    @staticmethod
+    def sync_employee(db: Session, zk_employee: dict):
+        """Synchronizuje dane pracownika z czytnika z bazą danych"""
+        try:
+            # Mapowanie pól z API na model bazy danych
+            employee_data = {
+                "enroll_number": str(zk_employee.get('enrollNumber')),
+                "name": zk_employee.get('name', ''),
+                "password": zk_employee.get('password'),
+                "card_number": zk_employee.get('cardNumber', ''),
+                "privileges": zk_employee.get('privilege', 0),
+                "is_active": zk_employee.get('enabled', True)
+            }
+
+            # Sprawdź czy pracownik już istnieje
+            existing_employee = db.query(Employee).filter(
+                Employee.enroll_number == employee_data['enroll_number']
+            ).first()
+
+            if existing_employee:
+                # Aktualizuj istniejącego pracownika
+                for key, value in employee_data.items():
+                    setattr(existing_employee, key, value)
+                db.commit()
+                return existing_employee
+            else:
+                # Dodaj nowego pracownika
+                new_employee = Employee(**employee_data)
+                db.add(new_employee)
+                db.commit()
+                db.refresh(new_employee)
+                return new_employee
+
+        except Exception as e:
+            db.rollback()
+            raise Exception(f"Błąd podczas synchronizacji pracownika: {str(e)}") 

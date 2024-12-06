@@ -8,6 +8,7 @@ class TerminalBase(BaseModel):
     ip_address: str
     port: int = 4370
     is_active: bool = True
+    is_main: bool = False
 
 class TerminalCreate(TerminalBase):
     pass
@@ -18,6 +19,7 @@ class TerminalUpdate(BaseModel):
     ip_address: Optional[str] = None
     port: Optional[int] = None
     is_active: Optional[bool] = None
+    is_main: Optional[bool] = None
 
 class TerminalResponse(TerminalBase):
     id: int

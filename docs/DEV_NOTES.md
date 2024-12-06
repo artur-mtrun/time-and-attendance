@@ -13,18 +13,7 @@
 - Linter: ESLint + Prettier
 
 ### Struktura projektu
-time-and-attendance/
-├── frontend/
-│   ├── src/
-│   ├── public/
-│   ├── package.json
-│   └── vite.config.js
-├── backend/
-└── docs/
-    ├── API_DOCS.md
-    ├── CHANGELOG.md
-    ├── DEV_NOTES.md
-    └── TODO.md
+
 
 ### Napotkane problemy i rozwiązania
 - Rozwiązano problem z podwójnym katalogiem frontend poprzez przeniesienie plików

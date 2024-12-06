@@ -10,4 +10,5 @@ class Terminal(Base, TimestampMixin):
     ip_address = Column(String(15), nullable=False)
     port = Column(Integer, default=4370)
     is_active = Column(Boolean, default=True)
+    is_main = Column(Boolean, default=False)
     last_sync_at = Column(DateTime, nullable=True) 

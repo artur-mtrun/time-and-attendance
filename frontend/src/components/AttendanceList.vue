@@ -60,10 +60,10 @@
                                 'text-red-600': log.in_out_mode === 2,
                                 'text-yellow-600': log.in_out_mode === 3 || log.in_out_mode === 4
                             }">
-                                {{ InOutModes[log.in_out_mode] }}
+                                {{ InOutModes[log.in_out_mode as InOutMode] }}
                             </span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">{{ VerifyModes[log.verify_mode] }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ VerifyModes[log.verify_mode as VerifyMode] }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -74,7 +74,7 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue';
 import { useAttendanceStore } from '@/stores/attendance';
-import { InOutModes, VerifyModes } from '@/types/attendance';
+import { InOutModes, VerifyModes, InOutMode, VerifyMode } from '@/types/attendance';
 
 const attendanceStore = useAttendanceStore();
 

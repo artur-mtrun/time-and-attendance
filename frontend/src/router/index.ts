@@ -42,6 +42,12 @@ const router = createRouter({
                     component: () => import('@/components/EmployeesList.vue')
                 },
                 {
+                    path: 'employees/sync',
+                    name: 'employees-sync',
+                    component: () => import('@/views/EmployeesSync.vue'),
+                    meta: { requiresAuth: true }
+                },
+                {
                     path: 'attendance',
                     name: 'attendance',
                     component: () => import('@/components/AttendanceList.vue')

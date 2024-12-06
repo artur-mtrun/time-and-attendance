@@ -19,15 +19,19 @@ export interface AttendanceFilter {
 
 // Mapowanie typów zdarzeń
 export const InOutModes = {
-    1: 'Wejście',
-    2: 'Wyjście',
-    3: 'Przerwa',
-    4: 'Powrót z przerwy'
+    2: "Wejście",
+    3: "Wyjście",
+    4: "Przerwa",
+    5: "Powrót z przerwy"
 } as const;
 
+export type InOutMode = keyof typeof InOutModes;
+
 export const VerifyModes = {
-    1: 'Odcisk palca',
-    2: 'Karta',
-    3: 'PIN',
-    4: 'Twarz'
-} as const; 
+    1: "Odcisk palca",
+    2: "Karta",
+    3: "PIN",
+    4: "Twarz"
+} as const;
+
+export type VerifyMode = keyof typeof VerifyModes; 

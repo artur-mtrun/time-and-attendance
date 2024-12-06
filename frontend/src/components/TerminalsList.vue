@@ -1,5 +1,11 @@
 <template>
     <div class="p-4">
+        <AlertMessage
+            :message="alertMessage"
+            :type="alertType"
+            @close="alertMessage = ''"
+        />
+
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-2xl font-bold">Lista czytników</h2>
             <button
@@ -10,12 +16,8 @@
             </button>
         </div>
 
-        <div v-if="terminalsStore.loading" class="text-center py-4">
-            Ładowanie...
-        </div>
-
-        <div v-else-if="terminalsStore.error" class="text-red-500 text-center py-4">
-            {{ terminalsStore.error }}
+        <div v-if="loading" class="flex justify-center py-4">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
         </div>
 
         <div v-else class="bg-white shadow-md rounded-lg">
@@ -27,19 +29,37 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">IP</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Port</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Główny</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ostatnia synchronizacja</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Akcje</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    <tr v-for="terminal in terminalsStore.terminals" :key="terminal.id">
-                        <td class="px-6 py-4 whitespace-nowrap">{{ terminal.number }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">{{ terminal.name }}</td>
+                    <tr 
+                        v-for="terminal in terminalsStore.terminals" 
+                        :key="terminal.id"
+                        :class="{
+                            'bg-blue-50': terminal.is_main,  // Tło dla głównego terminala
+                            'hover:bg-blue-100': terminal.is_main,  // Efekt hover dla głównego
+                            'hover:bg-gray-50': !terminal.is_main   // Standardowy hover dla pozostałych
+                        }"
+                    >
+                        <td class="px-6 py-4 whitespace-nowrap" :class="{ 'font-semibold': terminal.is_main }">
+                            {{ terminal.number }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap" :class="{ 'font-semibold': terminal.is_main }">
+                            {{ terminal.name }}
+                        </td>
                         <td class="px-6 py-4 whitespace-nowrap">{{ terminal.ip_address }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">{{ terminal.port }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span :class="terminal.is_active ? 'text-green-600' : 'text-red-600'">
                                 {{ terminal.is_active ? 'Aktywny' : 'Nieaktywny' }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span :class="terminal.is_main ? 'text-blue-600 font-semibold' : 'text-gray-600'">
+                                {{ terminal.is_main ? 'Tak' : 'Nie' }}
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
@@ -127,6 +147,16 @@
                             <span class="ml-2 text-sm text-gray-600">Aktywny</span>
                         </label>
                     </div>
+                    <div class="mb-4">
+                        <label class="flex items-center">
+                            <input
+                                v-model="formData.is_main"
+                                type="checkbox"
+                                class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                            />
+                            <span class="ml-2 text-sm text-gray-600">Terminal główny</span>
+                        </label>
+                    </div>
                     <div class="flex justify-end space-x-2">
                         <button
                             type="button"
@@ -174,45 +204,53 @@
 import { onMounted, ref } from 'vue';
 import { useTerminalsStore } from '@/stores/terminals';
 import type { Terminal } from '@/types/terminal';
+import AlertMessage from './AlertMessage.vue';
 
 const terminalsStore = useTerminalsStore();
 const showCreateModal = ref(false);
 const editedTerminal = ref<Terminal | null>(null);
 const terminalToDelete = ref<Terminal | null>(null);
 const syncingTerminal = ref<number | null>(null);
+const loading = ref(false);
+const alertMessage = ref('');
+const alertType = ref<'error' | 'success'>('error');
 
 const formData = ref({
     number: 0,
     name: '',
     ip_address: '',
     port: 4370,
-    is_active: true
+    is_active: true,
+    is_main: false
 });
 
-onMounted(() => {
-    terminalsStore.fetchTerminals();
-});
-
-function editTerminal(terminal: Terminal) {
-    editedTerminal.value = terminal;
-    formData.value = {
-        number: terminal.number,
-        name: terminal.name,
-        ip_address: terminal.ip_address,
-        port: terminal.port,
-        is_active: terminal.is_active
-    };
-    showCreateModal.value = true;
+async function loadTerminals() {
+    loading.value = true;
+    try {
+        await terminalsStore.fetchTerminals();
+    } catch (error: any) {
+        alertMessage.value = error.response?.data?.detail || 'Nie udało się pobrać listy czytników';
+        alertType.value = 'error';
+    } finally {
+        loading.value = false;
+    }
 }
 
-function confirmDelete(terminal: Terminal) {
-    terminalToDelete.value = terminal;
-}
-
-async function deleteTerminal() {
-    if (terminalToDelete.value) {
-        await terminalsStore.deleteTerminal(terminalToDelete.value.id);
-        terminalToDelete.value = null;
+async function handleSubmit() {
+    try {
+        if (editedTerminal.value) {
+            await terminalsStore.updateTerminal(editedTerminal.value.id, formData.value);
+            alertMessage.value = 'Czytnik został zaktualizowany';
+        } else {
+            await terminalsStore.createTerminal(formData.value);
+            alertMessage.value = 'Czytnik został dodany';
+        }
+        alertType.value = 'success';
+        closeModal();
+        await loadTerminals(); // Odśwież listę po udanej operacji
+    } catch (error: any) {
+        alertMessage.value = error.response?.data?.detail || 'Wystąpił błąd podczas zapisywania czytnika';
+        alertType.value = 'error';
     }
 }
 
@@ -220,6 +258,12 @@ async function syncTerminal(terminal: Terminal) {
     syncingTerminal.value = terminal.id;
     try {
         await terminalsStore.syncTerminal(terminal.id);
+        alertMessage.value = 'Synchronizacja zakończona pomyślnie';
+        alertType.value = 'success';
+        await loadTerminals(); // Odśwież listę po synchronizacji
+    } catch (error: any) {
+        alertMessage.value = error.response?.data?.detail || 'Nie udało się zsynchronizować czytnika';
+        alertType.value = 'error';
     } finally {
         syncingTerminal.value = null;
     }
@@ -233,20 +277,36 @@ function closeModal() {
         name: '',
         ip_address: '',
         port: 4370,
-        is_active: true
+        is_active: true,
+        is_main: false
     };
 }
 
-async function handleSubmit() {
-    try {
-        if (editedTerminal.value) {
-            await terminalsStore.updateTerminal(editedTerminal.value.id, formData.value);
-        } else {
-            await terminalsStore.createTerminal(formData.value);
-        }
-        closeModal();
-    } catch (error) {
-        console.error('Failed to save terminal:', error);
+onMounted(() => {
+    loadTerminals();
+});
+
+function editTerminal(terminal: Terminal) {
+    editedTerminal.value = terminal;
+    formData.value = {
+        number: terminal.number,
+        name: terminal.name,
+        ip_address: terminal.ip_address,
+        port: terminal.port,
+        is_active: terminal.is_active,
+        is_main: terminal.is_main
+    };
+    showCreateModal.value = true;
+}
+
+function confirmDelete(terminal: Terminal) {
+    terminalToDelete.value = terminal;
+}
+
+async function deleteTerminal() {
+    if (terminalToDelete.value) {
+        await terminalsStore.deleteTerminal(terminalToDelete.value.id);
+        terminalToDelete.value = null;
     }
 }
 </script> 
