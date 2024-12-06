@@ -39,7 +39,7 @@ const router = createRouter({
                 {
                     path: 'employees',
                     name: 'employees',
-                    component: () => import('@/components/EmployeesList.vue')
+                    component: () => import('@/views/Employees.vue')
                 },
                 {
                     path: 'employees/sync',

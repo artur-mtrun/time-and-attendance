@@ -10,7 +10,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import EmployeeList from '../components/EmployeeList.vue';
+import EmployeeList from '@/components/EmployeesList.vue';
 import { employeeService } from '../services/employees';
 import type { Employee } from '@/types/employee';
 

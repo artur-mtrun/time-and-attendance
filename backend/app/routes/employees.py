@@ -15,7 +15,14 @@ router = APIRouter(prefix="/employees", tags=["employees"])
 
 @router.get("", response_model=List[EmployeeResponse])
 def get_employees(db: Session = Depends(get_db)):
-    return EmployeeService.get_employees(db)
+    try:
+        return EmployeeService.get_employees(db)
+    except Exception as e:
+        logger.error(f"Błąd podczas pobierania pracowników: {str(e)}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Błąd podczas pobierania pracowników: {str(e)}"
+        )
 
 @router.post("", response_model=EmployeeResponse)
 def create_employee(employee: EmployeeCreate, db: Session = Depends(get_db)):

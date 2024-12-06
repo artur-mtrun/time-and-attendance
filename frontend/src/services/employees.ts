@@ -1,28 +1,36 @@
-import axios from '../plugins/axios.js';
+import axiosInstance from '../plugins/axios.js';
 import type { Employee, CreateEmployeeData, UpdateEmployeeData } from '../types/employee.js';
+import axios from 'axios';
 
 export const employeeService = {
     async getEmployees(): Promise<Employee[]> {
-        const response = await axios.get<Employee[]>('/employees');
-        return response.data;
+        console.log('Wywołanie getEmployees');
+        try {
+            const response = await axiosInstance.get('/api/employees');
+            console.log('Odpowiedź getEmployees:', response.data);
+            return response.data;
+        } catch (error) {
+            console.error('Błąd getEmployees:', error);
+            throw error;
+        }
     },
 
     async createEmployee(data: CreateEmployeeData): Promise<Employee> {
-        const response = await axios.post<Employee>('/employees', data);
+        const response = await axiosInstance.post<Employee>('/api/employees', data);
         return response.data;
     },
 
     async updateEmployee(id: number, data: UpdateEmployeeData): Promise<Employee> {
-        const response = await axios.put<Employee>(`/employees/${id}`, data);
+        const response = await axiosInstance.put<Employee>(`/api/employees/${id}`, data);
         return response.data;
     },
 
     async deleteEmployee(id: number): Promise<void> {
-        await axios.delete(`/employees/${id}`);
+        await axiosInstance.delete(`/api/employees/${id}`);
     },
 
     async fetchFromMainTerminal(): Promise<Employee[]> {
-        const response = await axios.post<Employee[]>('/Employee/get-all');
+        const response = await axiosInstance.post<Employee[]>('/api/employees/get-all');
         return response.data;
     },
 
@@ -31,17 +39,36 @@ export const employeeService = {
     },
 
     async checkSync() {
-        const response = await axios.post('/employees/sync-from-main');
-        return response.data;
+        console.log('Wywołanie checkSync');
+        try {
+            const response = await axiosInstance.post('/api/employees/sync-from-main');
+            console.log('Odpowiedź checkSync:', response.data);
+            return response.data;
+        } catch (error) {
+            if (axios.isAxiosError(error) && error.code === 'ECONNABORTED') {
+                console.error('Timeout podczas synchronizacji');
+                throw new Error('Przekroczono czas oczekiwania na odpowiedź serwera');
+            }
+            console.error('Błąd checkSync:', error);
+            throw error;
+        }
     },
 
     async confirmSync() {
-        const response = await axios.post('/employees/sync-from-main/confirm');
-        return response.data;
+        console.log('Wywołanie confirmSync');
+        try {
+            const response = await axiosInstance.post('/api/employees/sync-from-main/confirm');
+            console.log('Odpowiedź confirmSync:', response.data);
+            await this.getEmployees();
+            return response.data;
+        } catch (error) {
+            console.error('Błąd confirmSync:', error);
+            throw error;
+        }
     },
 
     async sendToTerminals(data: { terminalIds: number[], employeeIds: number[] }) {
-        const response = await axios.post('/api/employees/send-to-terminals', data);
+        const response = await axiosInstance.post('/api/employees/send-to-terminals', data);
         return response.data;
     }
 }; 

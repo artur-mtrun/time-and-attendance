@@ -14,21 +14,21 @@ export interface UpdateUserData {
 
 export const userService = {
     async getUsers(): Promise<User[]> {
-        const response = await axios.get<User[]>('/users');
+        const response = await axios.get<User[]>('/api/users');
         return response.data;
     },
 
     async createUser(userData: CreateUserData): Promise<User> {
-        const response = await axios.post<User>('/users', userData);
+        const response = await axios.post<User>('/api/users', userData);
         return response.data;
     },
 
     async updateUser(userId: number, userData: UpdateUserData): Promise<User> {
-        const response = await axios.put<User>(`/users/${userId}`, userData);
+        const response = await axios.put<User>(`/api/users/${userId}`, userData);
         return response.data;
     },
 
     async deleteUser(userId: number): Promise<void> {
-        await axios.delete(`/users/${userId}`);
+        await axios.delete(`/api/users/${userId}`);
     }
 }; 

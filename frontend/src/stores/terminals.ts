@@ -9,15 +9,13 @@ export const useTerminalsStore = defineStore('terminals', () => {
     const error = ref<string | null>(null);
 
     async function fetchTerminals() {
-        loading.value = true;
-        error.value = null;
         try {
-            terminals.value = await terminalService.getTerminals();
-        } catch (err: any) {
-            error.value = err.response?.data?.detail || 'Nie udało się pobrać listy czytników';
-            throw err;
-        } finally {
-            loading.value = false;
+            const data = await terminalService.getTerminals();
+            terminals.value = data;
+            return data;
+        } catch (error) {
+            console.error('Błąd podczas pobierania terminali:', error);
+            throw error;
         }
     }
 

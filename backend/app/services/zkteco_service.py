@@ -4,6 +4,8 @@ import logging
 from app.core.config import settings
 from app.services.terminal import TerminalService
 from sqlalchemy.orm import Session
+from requests.exceptions import Timeout, ConnectionError
+from fastapi import HTTPException
 
 # Konfiguracja loggera
 logger = logging.getLogger(__name__)
@@ -13,6 +15,7 @@ class ZKTecoService:
     def __init__(self, db: Session):
         self.base_url = settings.ZKTECO_API_URL
         self.db = db
+        self.timeout = 5  # 5 sekund timeoutu
         logger.debug(f"Inicjalizacja ZKTecoService z URL: {self.base_url}")
         
     def get_all_employees(self) -> List[Dict[Any, Any]]:
@@ -35,7 +38,8 @@ class ZKTecoService:
             
             response = requests.post(
                 f"{self.base_url}/api/Employee/get-all",
-                json=device_request
+                json=device_request,
+                timeout=self.timeout  # dodajemy timeout
             )
             
             logger.debug(f"Status odpowiedzi: {response.status_code}")
@@ -52,9 +56,16 @@ class ZKTecoService:
                 logger.error("Nieoczekiwana struktura odpowiedzi API")
                 raise Exception("Nieoczekiwana struktura odpowiedzi API")
             
-        except requests.RequestException as e:
-            logger.error(f"Błąd podczas komunikacji z API ZKTeco: {str(e)}")
-            raise Exception(f"Błąd podczas komunikacji z API ZKTeco: {str(e)}")
+        except Timeout:
+            raise HTTPException(
+                status_code=504,
+                detail="Timeout podczas połączenia z czytnikiem"
+            )
+        except ConnectionError:
+            raise HTTPException(
+                status_code=503,
+                detail="Nie można połączyć się z czytnikiem"
+            )
         except Exception as e:
             logger.error(f"Nieoczekiwany błąd: {str(e)}")
             raise 

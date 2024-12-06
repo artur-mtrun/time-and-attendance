@@ -1,11 +1,20 @@
 from sqlalchemy.orm import Session
 from app.models.employee import Employee
 from app.schemas.employee import EmployeeCreate, EmployeeUpdate
+import logging
+
+logger = logging.getLogger(__name__)
 
 class EmployeeService:
     @staticmethod
     def get_employees(db: Session):
-        return db.query(Employee).all()
+        try:
+            employees = db.query(Employee).all()
+            logger.debug(f"Pobrano {len(employees)} pracowników")
+            return employees
+        except Exception as e:
+            logger.error(f"Błąd podczas pobierania pracowników: {str(e)}", exc_info=True)
+            raise Exception(f"Błąd podczas pobierania pracowników: {str(e)}")
 
     @staticmethod
     def get_employee(db: Session, employee_id: int):

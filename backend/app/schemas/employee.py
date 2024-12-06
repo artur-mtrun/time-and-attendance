@@ -1,28 +1,28 @@
 from pydantic import BaseModel
 from typing import Optional
+from datetime import datetime
 
 class EmployeeBase(BaseModel):
     enroll_number: str
     name: str
-    password: Optional[str] = None
-    card_number: Optional[str] = None
+    password: str | None = None
+    card_number: str | None = None
     privileges: int = 0
     is_active: bool = True
 
 class EmployeeCreate(EmployeeBase):
     pass
 
-class EmployeeUpdate(BaseModel):
-    name: Optional[str] = None
-    password: Optional[str] = None
-    card_number: Optional[str] = None
-    privileges: Optional[int] = None
-    is_active: Optional[bool] = None
+class EmployeeUpdate(EmployeeBase):
+    pass
 
 class EmployeeResponse(EmployeeBase):
     id: int
-    created_at: str
-    updated_at: str
+    created_at: datetime
+    updated_at: datetime
 
     class Config:
-        from_attributes = True 
+        from_attributes = True
+        json_encoders = {
+            datetime: lambda dt: dt.isoformat()
+        } 

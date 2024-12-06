@@ -17,17 +17,25 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 app = FastAPI()
 
 # Middleware do logowania requestów
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
-    logger.debug(f"Przychodzący request: {request.method} {request.url}")
-    logger.debug(f"Headers: {request.headers}")
-    response = await call_next(request)
-    logger.debug(f"Status odpowiedzi: {response.status_code}")
-    return response
+    try:
+        logger.debug(f"Przychodzący request: {request.method} {request.url}")
+        logger.debug(f"Headers: {request.headers}")
+        logger.debug(f"Client host: {request.client.host}")
+        
+        response = await call_next(request)
+        
+        logger.debug(f"Status odpowiedzi: {response.status_code}")
+        return response
+    except Exception as e:
+        logger.error(f"Błąd podczas przetwarzania requestu: {str(e)}", exc_info=True)
+        raise
 
 # Konfiguracja CORS
 app.add_middleware(

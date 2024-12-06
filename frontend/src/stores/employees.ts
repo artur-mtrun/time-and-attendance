@@ -10,15 +10,13 @@ export const useEmployeesStore = defineStore('employees', () => {
     const error = ref<string | null>(null);
 
     async function fetchEmployees() {
-        loading.value = true;
-        error.value = null;
         try {
-            employees.value = await employeeService.getEmployees();
-        } catch (e) {
-            error.value = 'Nie udało się pobrać listy pracowników';
-            console.error(e);
-        } finally {
-            loading.value = false;
+            const data = await employeeService.getEmployees();
+            employees.value = data;
+            return data;
+        } catch (error) {
+            console.error('Błąd podczas pobierania pracowników:', error);
+            throw error;
         }
     }
 
@@ -68,11 +66,15 @@ export const useEmployeesStore = defineStore('employees', () => {
             const syncResult = await employeeService.checkSync();
             
             if (syncResult.to_add.length > 0 || syncResult.to_update.length > 0) {
-                await employeeService.confirmSync();
+                return {
+                    message: 'Znaleziono różnice w danych pracowników',
+                    to_add: syncResult.to_add,
+                    to_update: syncResult.to_update,
+                    summary: syncResult.summary
+                };
             }
             
-            await fetchEmployees();
-            return true;
+            return null;
         } catch (err: any) {
             error.value = err.response?.data?.detail || 'Nie udało się pobrać pracowników z terminala wzorcowego';
             throw err;
@@ -105,7 +107,12 @@ export const useEmployeesStore = defineStore('employees', () => {
     async function checkSync() {
         try {
             const result = await employeeService.checkSync();
-            return result;
+            return {
+                message: result.message,
+                summary: result.summary,
+                to_add: result.to_add,
+                to_update: result.to_update
+            };
         } catch (e) {
             error.value = 'Nie udało się sprawdzić zmian';
             throw e;
@@ -113,6 +120,7 @@ export const useEmployeesStore = defineStore('employees', () => {
     }
 
     async function confirmSync() {
+        loading.value = true;
         try {
             await employeeService.confirmSync();
             await fetchEmployees();
@@ -120,6 +128,8 @@ export const useEmployeesStore = defineStore('employees', () => {
         } catch (e) {
             error.value = 'Nie udało się zatwierdzić zmian';
             throw e;
+        } finally {
+            loading.value = false;
         }
     }
 
