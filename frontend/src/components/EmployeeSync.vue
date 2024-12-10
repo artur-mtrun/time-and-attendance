@@ -1,6 +1,6 @@
 <template>
     <div>
-        <v-card>
+        <v-card class="mb-4">
             <v-card-title>Synchronizacja pracowników</v-card-title>
             
             <v-card-text v-if="loading">
@@ -52,6 +52,49 @@
             </v-card-actions>
         </v-card>
 
+        <!-- Sekcja wyboru pracowników i terminali -->
+        <v-card>
+            <v-card-title>Wyślij do terminali</v-card-title>
+            
+            <v-card-text>
+                <div class="mb-4">
+                    <h3 class="text-h6 mb-2">Wybierz pracowników:</h3>
+                    <v-data-table
+                        v-model="selectedEmployees"
+                        :headers="employeeHeaders"
+                        :items="employees"
+                        :items-per-page="10"
+                        show-select
+                        class="elevation-1"
+                    ></v-data-table>
+                </div>
+
+                <div class="mb-4">
+                    <h3 class="text-h6 mb-2">Wybierz terminale:</h3>
+                    <v-data-table
+                        v-model="selectedTerminals"
+                        :headers="terminalHeaders"
+                        :items="terminals"
+                        :items-per-page="5"
+                        show-select
+                        class="elevation-1"
+                    ></v-data-table>
+                </div>
+            </v-card-text>
+
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn
+                    color="primary"
+                    :disabled="!canSendToTerminals || sending"
+                    :loading="sending"
+                    @click="sendToTerminals"
+                >
+                    Wyślij do terminali
+                </v-btn>
+            </v-card-actions>
+        </v-card>
+
         <v-snackbar v-model="showSnackbar" :color="snackbarColor">
             {{ snackbarText }}
         </v-snackbar>
@@ -59,8 +102,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { employeeService } from '../services/employees';
+import { useEmployeesStore } from '../stores/employees';
+import { useTerminalsStore } from '../stores/terminals';
 
 interface SyncData {
     summary: {
@@ -80,10 +125,36 @@ interface SyncData {
 
 const loading = ref(false);
 const confirming = ref(false);
+const sending = ref(false);
 const syncData = ref<SyncData | null>(null);
 const showSnackbar = ref(false);
 const snackbarText = ref('');
 const snackbarColor = ref('');
+
+const employeesStore = useEmployeesStore();
+const terminalsStore = useTerminalsStore();
+
+const selectedEmployees = ref([]);
+const selectedTerminals = ref([]);
+
+const employeeHeaders = [
+    { text: 'Numer', value: 'enroll_number' },
+    { text: 'Imię i nazwisko', value: 'name' },
+    { text: 'Numer karty', value: 'card_number' }
+];
+
+const terminalHeaders = [
+    { text: 'Nazwa', value: 'name' },
+    { text: 'IP', value: 'ip_address' },
+    { text: 'Port', value: 'port' }
+];
+
+const employees = computed(() => employeesStore.employees);
+const terminals = computed(() => terminalsStore.terminals);
+
+const canSendToTerminals = computed(() => 
+    selectedEmployees.value.length > 0 && selectedTerminals.value.length > 0
+);
 
 const showMessage = (text: string, color: string = 'success') => {
     snackbarText.value = text;
@@ -94,9 +165,13 @@ const showMessage = (text: string, color: string = 'success') => {
 onMounted(async () => {
     try {
         loading.value = true;
-        syncData.value = await employeeService.checkSync();
+        await Promise.all([
+            employeesStore.fetchEmployees(),
+            terminalsStore.fetchTerminals(),
+            syncData.value = await employeeService.checkSync()
+        ]);
     } catch (error) {
-        showMessage('Błąd podczas sprawdzania różnic', 'error');
+        showMessage('Błąd podczas ładowania danych', 'error');
         console.error(error);
     } finally {
         loading.value = false;
@@ -115,6 +190,25 @@ const confirmSync = async () => {
         console.error(error);
     } finally {
         confirming.value = false;
+    }
+};
+
+const sendToTerminals = async () => {
+    try {
+        sending.value = true;
+        const result = await employeesStore.sendToTerminals({
+            terminalIds: selectedTerminals.value.map(t => t.id),
+            employeeIds: selectedEmployees.value.map(e => e.id)
+        });
+        
+        showMessage('Pomyślnie wysłano dane do terminali');
+        selectedEmployees.value = [];
+        selectedTerminals.value = [];
+    } catch (error) {
+        showMessage('Błąd podczas wysyłania do terminali', 'error');
+        console.error(error);
+    } finally {
+        sending.value = false;
     }
 };
 </script>
