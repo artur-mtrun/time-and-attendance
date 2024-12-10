@@ -4,6 +4,15 @@ import type { Employee, CreateEmployeeData, UpdateEmployeeData } from '../types/
 import { employeeService } from '../services/employees.js';
 import axios from 'axios';
 
+interface SendToTerminalsResponse {
+    message: string;
+    details: Array<{
+        terminal_id: number;
+        status: 'success' | 'error';
+        message: string;
+    }>;
+}
+
 export const useEmployeesStore = defineStore('employees', () => {
     const employees = ref<Employee[]>([]);
     const loading = ref(false);
@@ -96,8 +105,8 @@ export const useEmployeesStore = defineStore('employees', () => {
 
     async function sendToTerminals(data: { terminalIds: number[], employeeIds: number[] }) {
         try {
-            await employeeService.sendToTerminals(data);
-            return true;
+            const response = await employeeService.sendToTerminals(data);
+            return response as SendToTerminalsResponse;
         } catch (error) {
             console.error('Błąd podczas wysyłania do terminali:', error);
             throw error;

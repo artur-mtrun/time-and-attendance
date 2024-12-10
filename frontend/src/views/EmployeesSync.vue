@@ -179,6 +179,44 @@
                 </div>
             </div>
         </div>
+
+        <div v-if="showSendReport" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white rounded-lg shadow-xl p-6 max-w-2xl w-full mx-4">
+                <h2 class="text-xl font-bold mb-4">Raport wysyłania</h2>
+                
+                <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4">
+                    {{ sendReport.message }}
+                </div>
+
+                <div class="mb-4">
+                    <h3 class="font-semibold mb-2">Szczegóły wysyłania:</h3>
+                    <div class="space-y-2">
+                        <div v-for="detail in sendReport.details" 
+                             :key="detail.terminal_id"
+                             :class="[
+                                 'p-3 rounded',
+                                 detail.status === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
+                             ]"
+                        >
+                            <div class="font-medium">
+                                Terminal #{{ getTerminalInfo(detail.terminal_id).number }} - 
+                                {{ getTerminalInfo(detail.terminal_id).name }}
+                            </div>
+                            <div class="text-sm">{{ detail.message }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-4 mt-6">
+                    <button 
+                        @click="showSendReport = false"
+                        class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
+                    >
+                        Zamknij
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -200,13 +238,27 @@ const alertMessage = ref('');
 const alertType = ref<'success' | 'error'>('success');
 const syncData = ref<any>(null);
 const showSyncDialog = ref(false);
+const showSendReport = ref(false);
+const sendReport = ref<{
+    message: string;
+    details: Array<{
+        terminal_id: number;
+        status: 'success' | 'error';
+        message: string;
+    }>;
+}>({ message: '', details: [] });
 
 // Załaduj dane przy montowaniu komponentu
 onMounted(async () => {
-    await Promise.all([
-        terminalsStore.fetchTerminals(),
-        employeesStore.fetchEmployees()
-    ]);
+    try {
+        await Promise.all([
+            terminalsStore.fetchTerminals(),
+            employeesStore.fetchEmployees()
+        ]);
+        console.log('Załadowane terminale:', terminalsStore.terminals);
+    } catch (error) {
+        console.error('Błąd podczas ładowania danych:', error);
+    }
 });
 
 const allTerminalsSelected = computed({
@@ -288,14 +340,19 @@ async function sendToTerminals() {
     
     isSending.value = true;
     try {
-        // TODO: Implementacja wysyłania do terminali
-        await employeesStore.sendToTerminals({
+        const response = await employeesStore.sendToTerminals({
             terminalIds: selectedTerminals.value,
             employeeIds: selectedEmployees.value
         });
-    } catch (error) {
+        
+        // Ustaw dane raportu
+        sendReport.value = response;
+        showSendReport.value = true;
+        
+    } catch (error: any) {
         console.error('Błąd podczas wysyłania danych do terminali:', error);
-        // TODO: Dodaj obsługę błędów (np. wyświetlenie komunikatu)
+        alertMessage.value = error.response?.data?.detail || 'Wystąpił błąd podczas wysyłania do terminali';
+        alertType.value = 'error';
     } finally {
         isSending.value = false;
     }
@@ -316,5 +373,16 @@ async function confirmSync() {
     } finally {
         isFetching.value = false;
     }
+}
+
+function getTerminalInfo(terminalId: number) {
+    const terminal = terminalsStore.terminals.find(t => t.id === terminalId);
+    if (!terminal) {
+        console.warn(`Nie znaleziono terminala o ID: ${terminalId}`);
+    }
+    return {
+        number: terminal?.number || terminalId,
+        name: terminal?.name || `Terminal ${terminalId}`
+    };
 }
 </script> 

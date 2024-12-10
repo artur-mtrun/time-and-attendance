@@ -60,24 +60,22 @@
                 <div class="mb-4">
                     <h3 class="text-h6 mb-2">Wybierz pracowników:</h3>
                     <v-data-table
-                        v-model="selectedEmployees"
-                        :headers="employeeHeaders"
+                        v-model:selected="selectedEmployees"
                         :items="employees"
-                        :items-per-page="10"
                         show-select
-                        class="elevation-1"
+                        item-value="id"
+                        return-object
                     ></v-data-table>
                 </div>
 
                 <div class="mb-4">
                     <h3 class="text-h6 mb-2">Wybierz terminale:</h3>
                     <v-data-table
-                        v-model="selectedTerminals"
-                        :headers="terminalHeaders"
+                        v-model:selected="selectedTerminals"
                         :items="terminals"
-                        :items-per-page="5"
                         show-select
-                        class="elevation-1"
+                        item-value="id"
+                        return-object
                     ></v-data-table>
                 </div>
             </v-card-text>
@@ -86,7 +84,7 @@
                 <v-spacer></v-spacer>
                 <v-btn
                     color="primary"
-                    :disabled="!canSendToTerminals || sending"
+                    :disabled="!selectedEmployees.length || !selectedTerminals.length"
                     :loading="sending"
                     @click="sendToTerminals"
                 >
@@ -98,6 +96,35 @@
         <v-snackbar v-model="showSnackbar" :color="snackbarColor">
             {{ snackbarText }}
         </v-snackbar>
+
+        <v-alert
+            v-if="alertMessage"
+            :type="alertType"
+            class="mt-4"
+            closable
+        >
+            {{ alertMessage }}
+        </v-alert>
+
+        <v-dialog v-model="showSendReport" width="500">
+            <v-card>
+                <v-card-title>Raport wysyłania</v-card-title>
+                <v-card-text>
+                    <div class="text-subtitle-1 mb-2">{{ sendReport.message }}</div>
+                    <v-list>
+                        <v-list-item v-for="detail in sendReport.details" :key="detail.terminal_id">
+                            <v-list-item-title :class="detail.status === 'success' ? 'text-success' : 'text-error'">
+                                Terminal #{{ detail.terminal_id }}: {{ detail.message }}
+                            </v-list-item-title>
+                        </v-list-item>
+                    </v-list>
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="primary" @click="showSendReport = false">Zamknij</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </div>
 </template>
 
@@ -121,6 +148,17 @@ interface SyncData {
         new: { name: string };
         enroll_number: string;
     }>;
+}
+
+interface SendReportDetail {
+    terminal_id: number;
+    status: 'success' | 'error';
+    message: string;
+}
+
+interface SendReport {
+    message: string;
+    details: SendReportDetail[];
 }
 
 const loading = ref(false);
@@ -162,6 +200,11 @@ const showMessage = (text: string, color: string = 'success') => {
     showSnackbar.value = true;
 };
 
+const alertMessage = ref('');
+const alertType = ref('');
+const showSendReport = ref(false);
+const sendReport = ref<SendReport>({ message: '', details: [] });
+
 onMounted(async () => {
     try {
         loading.value = true;
@@ -194,19 +237,26 @@ const confirmSync = async () => {
 };
 
 const sendToTerminals = async () => {
+    if (!canSendToTerminals.value) return;
+    
+    sending.value = true;
     try {
-        sending.value = true;
-        const result = await employeesStore.sendToTerminals({
-            terminalIds: selectedTerminals.value.map(t => t.id),
-            employeeIds: selectedEmployees.value.map(e => e.id)
+        const response = await employeesStore.sendToTerminals({
+            terminalIds: selectedTerminals.value,
+            employeeIds: selectedEmployees.value
         });
         
-        showMessage('Pomyślnie wysłano dane do terminali');
-        selectedEmployees.value = [];
-        selectedTerminals.value = [];
+        // Ustawienie komunikatu o sukcesie
+        alertMessage.value = response.message || 'Dane zostały pomyślnie wysłane do terminali';
+        alertType.value = 'success';
+        
+        // Wyświetlenie szczegółów w konsoli
+        console.log('Raport wysyłania:', response.details);
+        
     } catch (error) {
-        showMessage('Błąd podczas wysyłania do terminali', 'error');
-        console.error(error);
+        console.error('Błąd podczas wysyłania danych do terminali:', error);
+        alertMessage.value = 'Wystąpił błąd podczas wysyłania do terminali';
+        alertType.value = 'error';
     } finally {
         sending.value = false;
     }
