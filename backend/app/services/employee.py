@@ -1,11 +1,89 @@
 from sqlalchemy.orm import Session
 from app.models.employee import Employee
 from app.schemas.employee import EmployeeCreate, EmployeeUpdate
+from app.services.zkteco_service import ZKTecoService
 import logging
 
 logger = logging.getLogger(__name__)
 
+# Cache na poziomie modułu
+_sync_cache = {
+    'raw_data': None,
+    'to_add': [],
+    'to_update': []
+}
+
 class EmployeeService:
+    def __init__(self, db: Session):
+        self.db = db
+
+    @staticmethod
+    def cache_sync_data(raw_data, to_add, to_update):
+        """Zapisuje dane synchronizacji w pamięci podręcznej"""
+        global _sync_cache
+        _sync_cache = {
+            'raw_data': raw_data,
+            'to_add': to_add,
+            'to_update': to_update
+        }
+
+    def sync_employees_with_reader(self):
+        """Synchronizuje dane pracowników używając danych z cache"""
+        try:
+            global _sync_cache
+            if not _sync_cache['raw_data']:
+                raise Exception("Brak danych w cache. Najpierw wykonaj synchronizację.")
+            
+            logger.info("Używam danych z cache")
+            
+            # Używamy już przetworzonych list to_add i to_update
+            for emp_data in _sync_cache['to_add']:
+                try:
+                    new_employee = Employee(
+                        enroll_number=emp_data['enroll_number'],
+                        name=emp_data['name'],
+                        card_number=emp_data.get('card_number'),
+                        privileges=emp_data.get('privileges', 0),
+                        is_active=emp_data.get('is_active', True)
+                    )
+                    self.db.add(new_employee)
+                    self.db.commit()
+                except Exception as e:
+                    logger.error(f"Błąd podczas dodawania pracownika: {str(e)}")
+                    self.db.rollback()
+                    raise
+
+            for emp_data in _sync_cache['to_update']:
+                try:
+                    existing = self.get_employee_by_enroll_number(self.db, emp_data['enroll_number'])
+                    if existing:
+                        existing.name = emp_data['new']['name']
+                        existing.card_number = emp_data['new']['card_number']
+                        existing.privileges = emp_data['new']['privileges']
+                        existing.is_active = emp_data['new']['is_active']
+                        self.db.commit()
+                except Exception as e:
+                    logger.error(f"Błąd podczas aktualizacji pracownika: {str(e)}")
+                    self.db.rollback()
+                    raise
+
+            result = {
+                "added": len(_sync_cache['to_add']),
+                "updated": len(_sync_cache['to_update']),
+                "total": len(_sync_cache['to_add']) + len(_sync_cache['to_update'])
+            }
+
+            # Wyczyść cache po udanej synchronizacji
+            _sync_cache['raw_data'] = None
+            _sync_cache['to_add'] = []
+            _sync_cache['to_update'] = []
+
+            return result
+
+        except Exception as e:
+            logger.error(f"Błąd podczas synchronizacji z cache: {str(e)}")
+            raise
+
     @staticmethod
     def get_employees(db: Session):
         try:
@@ -93,3 +171,12 @@ class EmployeeService:
         except Exception as e:
             db.rollback()
             raise Exception(f"Błąd podczas synchronizacji pracownika: {str(e)}") 
+
+    def get_employees_from_reader(self):
+        """Pobiera pracowników z czytnika wzorcowego"""
+        zkteco_service = ZKTecoService(self.db)
+        return zkteco_service.get_all_employees()
+
+    def get_all_employees(self):
+        """Pobiera pracowników z bazy danych"""
+        return self.get_employees(self.db) 

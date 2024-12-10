@@ -101,7 +101,11 @@ def sync_employees_from_main(db: Session = Depends(get_db)):
                     'privileges': zk_emp.get('privilege'),
                     'is_active': zk_emp.get('enabled', True)
                 })
-
+        
+        # Cache dane do późniejszego użycia
+        employee_service = EmployeeService(db)
+        employee_service.cache_sync_data(employees_data, to_add, to_update)
+        
         result = {
             "message": "Znaleziono różnice w danych pracowników",
             "to_add": to_add,
@@ -128,16 +132,15 @@ def sync_employees_from_main(db: Session = Depends(get_db)):
 def confirm_sync_employees(db: Session = Depends(get_db)):
     try:
         logger.info("Rozpoczynam zapisywanie zmian z synchronizacji")
-        zkteco_service = ZKTecoService(db)
-        employees_data = zkteco_service.get_all_employees()
+        employee_service = EmployeeService(db)
         
-        synced_count = 0
-        for emp_data in employees_data:
-            EmployeeService.sync_employee(db, emp_data)
-            synced_count += 1
-            
+        # Używamy danych z cache zamiast ponownego łączenia z czytnikiem
+        result = employee_service.sync_employees_with_reader()
+        
+        logger.info(f"Pomyślnie zsynchronizowano dane: {result}")
         return {
-            "message": f"Pomyślnie zsynchronizowano {synced_count} pracowników"
+            "message": f"Pomyślnie zsynchronizowano {result['total']} pracowników",
+            "details": result
         }
         
     except Exception as e:
