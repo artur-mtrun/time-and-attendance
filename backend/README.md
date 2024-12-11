@@ -1,3 +1,3 @@
 Uruchomienie backendu:
-source venv/bin/activate  # na Linuxie/MacOS
+source venv/bin/activate 
 uvicorn app.main:app --reload

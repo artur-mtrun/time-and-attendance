@@ -15,8 +15,8 @@ class AttendanceService:
                 Employee.name.label('employee_name'),
                 Terminal.name.label('terminal_name')
             )
-            .join(Employee, AttendanceLog.employee_id == Employee.id)
-            .join(Terminal, AttendanceLog.terminal_id == Terminal.id)
+            .join(Employee, AttendanceLog.enroll_number == Employee.enroll_number)
+            .join(Terminal, AttendanceLog.terminal_number == Terminal.number)
         )
 
         if start_date and end_date:

@@ -4,7 +4,7 @@ from typing import Optional
 
 class AttendanceAllBase(BaseModel):
     enroll_number: str
-    terminal_id: int
+    terminal_number: int
     event_timestamp: datetime
     in_out_mode: Optional[int] = None
     verify_mode: Optional[int] = None
@@ -25,7 +25,7 @@ class AttendanceAllResponse(AttendanceAllBase):
             "example": {
                 "id": 1,
                 "enroll_number": "60000",
-                "terminal_id": 1,
+                "terminal_number": 1,
                 "event_timestamp": "2024-12-11T10:55:20",
                 "in_out_mode": 2,
                 "verify_mode": 1,

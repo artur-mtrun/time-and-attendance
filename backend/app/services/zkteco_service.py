@@ -157,7 +157,7 @@ class ZKTecoService:
                 mapped_data = []
                 for record in attendance_data:
                     mapped_record = {
-                        'enrollNumber': record.get('userId', ''),  # Mapowanie userId na enrollNumber
+                    'enrollNumber': record.get('userId', ''),  # Mapowanie userId na enrollNumber
                     'timestamp': record.get('logTime', ''),    # Mapowanie logTime na timestamp
                     'inOutMode': record.get('inOutMode', 0),
                     'verifyMode': record.get('verifyMode', 0),

@@ -3,13 +3,13 @@ from datetime import datetime
 from typing import Optional
 
 class AttendanceBase(BaseModel):
-    employee_id: int
-    terminal_id: int
+    enroll_number: str
+    terminal_number: int
     event_timestamp: datetime
     in_out_mode: int
     verify_mode: int
     work_code: int
-
+    is_sync: bool = False
 class AttendanceCreate(AttendanceBase):
     pass
 

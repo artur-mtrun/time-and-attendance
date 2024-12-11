@@ -50,12 +50,12 @@ async def fetch_from_terminals(
                     try:
                         new_record = AttendanceAll(
                             enroll_number=record['enrollNumber'],
-                            terminal_id=terminal.id,
+                            terminal_number=terminal.number,
                             event_timestamp=record['timestamp'] or None,
                             in_out_mode=int(record['inOutMode'] or 0),
                             verify_mode=int(record['verifyMode'] or 0),
                             work_code=int(record.get('workCode', 0) or 0),
-                            is_sync=True
+                            is_sync=False
                         )
                         db.add(new_record)
                         valid_records += 1

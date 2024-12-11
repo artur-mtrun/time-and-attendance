@@ -31,7 +31,7 @@ class SyncService:
                     exists_query = db.query(exists().where(
                         and_(
                             AttendanceLog.enroll_number== record.enroll_number,
-                            AttendanceLog.terminal_id == record.terminal_id,
+                            AttendanceLog.terminal_number== record.terminal_number,
                             AttendanceLog.event_timestamp == record.event_timestamp,
                             AttendanceLog.verify_mode == record.verify_mode
                         )
@@ -47,7 +47,7 @@ class SyncService:
                             # Dodaj nowy wpis do attendance_logs
                             new_log = AttendanceLog(
                                 employee_id=employee.id,
-                                terminal_id=record.terminal_id,
+                                terminal_id=record.terminal_number,
                                 event_timestamp=record.event_timestamp,
                                 in_out_mode=record.in_out_mode,
                                 verify_mode=record.verify_mode,
