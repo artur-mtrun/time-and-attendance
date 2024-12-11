@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import { authService } from '@/services/auth';
 import LoginForm from '@/components/LoginForm.vue';
 import MainHeader from '@/layouts/MainHeader.vue';
+import AttendanceAll from '../views/AttendanceAll.vue';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -51,6 +52,16 @@ const router = createRouter({
                     path: 'attendance',
                     name: 'attendance',
                     component: () => import('@/components/AttendanceList.vue')
+                },
+                {
+                    path: 'attendance-all',
+                    name: 'attendance-all',
+                    component: () => import('@/views/AttendanceAll.vue')
+                },
+                {
+                    path: '/scheduler',
+                    name: 'scheduler',
+                    component: () => import('@/views/SchedulerManager.vue')
                 }
             ]
         }

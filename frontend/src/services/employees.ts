@@ -70,5 +70,22 @@ export const employeeService = {
     async sendToTerminals(data: { terminalIds: number[], employeeIds: number[] }) {
         const response = await axiosInstance.post('/api/employees/send-to-terminals', data);
         return response.data;
+    },
+
+    async fetchAttendanceFromTerminals(terminalIds: number[]) {
+        console.log('Wywołanie fetchAttendanceFromTerminals');
+        try {
+            const response = await axiosInstance.post('/api/attendance-all/fetch-from-terminals', {
+                terminal_ids: terminalIds
+            });
+            console.log('Odpowiedź fetchAttendanceFromTerminals:', response.data);
+            return response.data;
+        } catch (error: any) {
+            console.error('Błąd fetchAttendanceFromTerminals:', error);
+            if (error.response?.data?.detail) {
+                throw new Error(error.response.data.detail);
+            }
+            throw error;
+        }
     }
 }; 

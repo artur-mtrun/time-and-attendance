@@ -36,6 +36,18 @@
                 </svg>
                 <span>{{ isSending ? 'Wysyłanie...' : 'Wyślij do zaznaczonych terminali' }}</span>
             </button>
+            
+            <button 
+                @click="fetchAttendanceFromTerminals"
+                :disabled="isFetchingAttendance || !selectedTerminals.length"
+                class="bg-purple-500 text-white px-6 py-2 rounded hover:bg-purple-600 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center"
+            >
+                <svg v-if="isFetchingAttendance" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>{{ isFetchingAttendance ? 'Pobieranie...' : 'Pobierz zdarzenia z zaznaczonych' }}</span>
+            </button>
         </div>
 
         <div class="grid grid-cols-2 gap-6">
@@ -226,6 +238,7 @@ import { useTerminalsStore } from '@/stores/terminals';
 import { useEmployeesStore } from '@/stores/employees';
 import AlertMessage from '@/components/AlertMessage.vue';
 import { employeeService } from '@/services/employees';
+import axios from 'axios';
 
 const terminalsStore = useTerminalsStore();
 const employeesStore = useEmployeesStore();
@@ -234,6 +247,7 @@ const selectedTerminals = ref<number[]>([]);
 const selectedEmployees = ref<number[]>([]);
 const isFetching = ref(false);
 const isSending = ref(false);
+const isFetchingAttendance = ref(false);
 const alertMessage = ref('');
 const alertType = ref<'success' | 'error'>('success');
 const syncData = ref<any>(null);
@@ -384,5 +398,31 @@ function getTerminalInfo(terminalId: number) {
         number: terminal?.number || terminalId,
         name: terminal?.name || `Terminal ${terminalId}`
     };
+}
+
+async function fetchAttendanceFromTerminals() {
+    if (!selectedTerminals.value.length) return;
+    
+    isFetchingAttendance.value = true;
+    try {
+        const response = await employeeService.fetchAttendanceFromTerminals(selectedTerminals.value);
+        
+        alertMessage.value = response.message;
+        alertType.value = 'success';
+        
+        // Wyświetl szczegółowy raport
+        sendReport.value = {
+            message: response.message,
+            details: response.details
+        };
+        showSendReport.value = true;
+        
+    } catch (error: any) {
+        console.error('Błąd podczas pobierania zdarzeń:', error);
+        alertMessage.value = error.response?.data?.detail || 'Wystąpił błąd podczas pobierania zdarzeń';
+        alertType.value = 'error';
+    } finally {
+        isFetchingAttendance.value = false;
+    }
 }
 </script> 

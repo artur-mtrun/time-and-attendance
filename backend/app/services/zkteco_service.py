@@ -124,3 +124,53 @@ class ZKTecoService:
         except Exception as e:
             logger.error(f"Błąd podczas wysyłania do terminala {terminal.ip_address}: {str(e)}")
             raise Exception(f"Błąd podczas wysyłania do terminala {terminal.ip_address}: {str(e)}")
+
+    def get_attendance_from_terminal(self, terminal: Any) -> List[Dict[Any, Any]]:
+        """Pobiera zdarzenia obecności z terminala"""
+        try:
+            logger.info(f"Pobieranie zdarzeń z terminala: IP={terminal.ip_address}, Port={terminal.port}")
+            
+            device_request = {
+                "ipAddress": terminal.ip_address,
+                "port": terminal.port,
+                "deviceNumber": terminal.number
+            }
+            
+            logger.debug(f"Wysyłam request do API ZKTeco: {device_request}")
+            
+            response = requests.post(
+                f"{self.base_url}/api/Attendance/get-all-logs",
+                json=device_request,
+                timeout=self.timeout
+            )
+            
+            logger.debug(f"Status odpowiedzi: {response.status_code}")
+            logger.debug(f"Treść odpowiedzi: {response.text}")
+            
+            response_data = response.json()
+            
+            if isinstance(response_data, dict) and 'data' in response_data:
+                attendance_data = response_data['data']
+                logger.info(f"Surowe dane z czytnika: {attendance_data}")
+                
+                # Mapowanie pól z odpowiedzi API
+                mapped_data = []
+                for record in attendance_data:
+                    mapped_record = {
+                        'enrollNumber': record.get('userId', ''),  # Mapowanie userId na enrollNumber
+                    'timestamp': record.get('logTime', ''),    # Mapowanie logTime na timestamp
+                    'inOutMode': record.get('inOutMode', 0),
+                    'verifyMode': record.get('verifyMode', 0),
+                    'workCode': record.get('workCode', 0)
+                    }
+                    mapped_data.append(mapped_record)
+                
+                logger.info(f"Pobrano i zmapowano {len(mapped_data)} zdarzeń z czytnika")
+                return mapped_data
+                
+            else:
+                raise Exception("Nieoczekiwana struktura odpowiedzi API")
+            
+        except Exception as e:
+            logger.error(f"Nieoczekiwany błąd: {str(e)}")
+            raise

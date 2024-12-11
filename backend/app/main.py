@@ -1,8 +1,9 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from app.routes import auth, users, terminals, employees, attendance
 from app.database import engine, SessionLocal
 from app.services.db_init import init_db
+from app.scheduler import init_scheduler, scheduler
+
 import logging
 import sys
 
@@ -18,6 +19,12 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
+
+# Inicjalizacja schedulera przed routerami
+init_scheduler()
+
+# Importy routerów po inicjalizacji schedulera
+from app.routes import auth, users, terminals, employees, attendance, attendance_all, scheduler
 
 app = FastAPI()
 
@@ -52,6 +59,8 @@ app.include_router(users.router, prefix="/api")
 app.include_router(terminals.router, prefix="/api")
 app.include_router(employees.router, prefix="/api")
 app.include_router(attendance.router, prefix="/api")
+app.include_router(attendance_all.router, prefix="/api")
+app.include_router(scheduler.router, prefix="/api")
 
 # Inicjalizacja bazy danych
 init_db(SessionLocal())

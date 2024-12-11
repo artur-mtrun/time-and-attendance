@@ -92,12 +92,12 @@
         </router-link>
 
         <router-link 
-          to="/employees/sync"
+          to="/attendance-all"
           class="flex items-center p-4 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors"
         >
           <div class="flex-1">
-            <h4 class="font-semibold text-indigo-700">Synchronizacja pracowników</h4>
-            <p class="text-sm text-indigo-600">Synchronizuj pracowników z czytnikami</p>
+            <h4 class="font-semibold text-indigo-700">Wszystkie obecności</h4>
+            <p class="text-sm text-indigo-600">Lista przed synchronizacją</p>
           </div>
         </router-link>
       </div>
