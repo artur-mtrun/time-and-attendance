@@ -80,6 +80,17 @@ export const useTerminalsStore = defineStore('terminals', () => {
         }
     }
 
+    async function fetchActiveTerminals() {
+        try {
+            const data = await terminalService.getActiveTerminals();
+            terminals.value = data;
+            return data;
+        } catch (error) {
+            console.error('Błąd podczas pobierania aktywnych terminali:', error);
+            throw error;
+        }
+    }
+
     return {
         terminals,
         loading,
@@ -88,6 +99,7 @@ export const useTerminalsStore = defineStore('terminals', () => {
         createTerminal,
         updateTerminal,
         deleteTerminal,
-        syncTerminal
+        syncTerminal,
+        fetchActiveTerminals
     };
 }); 

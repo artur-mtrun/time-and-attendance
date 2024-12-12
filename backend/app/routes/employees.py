@@ -58,6 +58,13 @@ def create_employee(employee: EmployeeCreate, db: Session = Depends(get_db)):
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+@router.get("/active", response_model=List[EmployeeResponse])
+def get_active_employees(db: Session = Depends(get_db)):
+    employees = EmployeeService.get_active_employees(db)
+    if not employees:
+        return []  # Zwracamy pustą listę zamiast 404
+    return employees
+
 @router.get("/{employee_id}", response_model=EmployeeResponse)
 def get_employee(employee_id: int, db: Session = Depends(get_db)):
     employee = EmployeeService.get_employee(db, employee_id)
@@ -227,7 +234,7 @@ def send_to_terminals(request: SendToTerminalsRequest, db: Session = Depends(get
                 })
         
         return {
-            "message": f"Zakończono wysyłanie. Sukces: {success_count}, Błędy: {failed_count}",
+            "message": f"Zakończono wysy��anie. Sukces: {success_count}, Błędy: {failed_count}",
             "details": results
         }
         
@@ -236,4 +243,5 @@ def send_to_terminals(request: SendToTerminalsRequest, db: Session = Depends(get
         raise HTTPException(
             status_code=500,
             detail=str(e)
-        ) 
+        )
+

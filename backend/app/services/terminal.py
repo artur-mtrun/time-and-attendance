@@ -80,3 +80,8 @@ class TerminalService:
     def get_master_terminal(db: Session):
         """Pobiera czytnik wzorcowy z bazy danych"""
         return db.query(Terminal).filter(Terminal.is_main == True).first()
+
+    @staticmethod
+    def get_active_terminals(db: Session):
+        terminals = db.query(Terminal).filter(Terminal.is_active == True).all()
+        return terminals  # Zwracamy pustą listę zamiast rzucać wyjątek

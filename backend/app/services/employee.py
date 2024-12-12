@@ -180,3 +180,8 @@ class EmployeeService:
     def get_all_employees(self):
         """Pobiera pracowników z bazy danych"""
         return self.get_employees(self.db) 
+
+    @staticmethod
+    def get_active_employees(db: Session):
+        employees = db.query(Employee).filter(Employee.is_active == True).all()
+        return employees  # Zwracamy pustą listę zamiast rzucać wyjątek

@@ -15,6 +15,13 @@ def get_terminals(db: Session = Depends(get_db)):
 def create_terminal(terminal: TerminalCreate, db: Session = Depends(get_db)):
     return TerminalService.create_terminal(db, terminal)
 
+@router.get("/active", response_model=List[TerminalResponse])
+def get_active_terminals(db: Session = Depends(get_db)):
+    terminals = TerminalService.get_active_terminals(db)
+    if not terminals:
+        return []
+    return terminals
+
 @router.get("/{terminal_id}", response_model=TerminalResponse)
 def get_terminal(terminal_id: int, db: Session = Depends(get_db)):
     terminal = TerminalService.get_terminal(db, terminal_id)
@@ -40,4 +47,5 @@ def sync_terminal(terminal_id: int, db: Session = Depends(get_db)):
     terminal = TerminalService.sync_terminal(db, terminal_id)
     if not terminal:
         raise HTTPException(status_code=404, detail="Terminal not found")
-    return terminal 
+    return terminal
+

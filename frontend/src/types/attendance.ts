@@ -15,6 +15,7 @@ export interface AttendanceLog {
 export interface AttendanceFilter {
     startDate: string;
     endDate: string;
+    employeeId?: string | number;
 }
 
 // Mapowanie typów zdarzeń

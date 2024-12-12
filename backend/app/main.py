@@ -1,11 +1,11 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from app.database import engine, SessionLocal
 from app.services.db_init import init_db
 from app.scheduler import init_scheduler, scheduler
 from app.routes import sync
-
-
+from starlette.responses import JSONResponse
+from app.dependencies.auth import oauth2_scheme
 
 import logging
 import sys
@@ -29,7 +29,17 @@ init_scheduler()
 # Importy routerów po inicjalizacji schedulera
 from app.routes import auth, users, terminals, employees, attendance, attendance_all, scheduler
 
-app = FastAPI()
+app = FastAPI(
+    docs_url="/docs",
+    redoc_url="/redoc",
+    openapi_url="/openapi.json",
+    swagger_ui_oauth2_redirect_url="/oauth2-redirect",
+    swagger_ui_init_oauth={
+        "usePkceWithAuthorizationCodeGrant": True,
+        "clientId": "swagger-ui",
+    },
+    swagger_ui_parameters={"persistAuthorization": True}
+)
 
 # Middleware do logowania requestów
 @app.middleware("http")
@@ -72,3 +82,32 @@ init_db(SessionLocal())
 @app.get("/")
 async def read_root():
     return {"Hello": "World"}
+
+@app.middleware("http")
+async def authenticate_requests(request: Request, call_next):
+    # Zawsze przepuszczaj OPTIONS dla CORS
+    if request.method == "OPTIONS":
+        response = await call_next(request)
+        return response
+        
+    # Lista dozwolonych ścieżek bez autoryzacji
+    allowed_paths = [
+        "/api/login",
+        "/",
+        "/docs",
+        "/redoc",
+        "/openapi.json",
+        "/oauth2-redirect",
+        "/api/auth/token"
+    ]
+    
+    if request.url.path not in allowed_paths:
+        token = request.headers.get("Authorization")
+        if not token or not token.startswith("Bearer "):
+            return JSONResponse(
+                status_code=401,
+                content={"detail": "Not authenticated"}
+            )
+    
+    response = await call_next(request)
+    return response

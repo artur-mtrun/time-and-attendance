@@ -142,6 +142,19 @@ export const useEmployeesStore = defineStore('employees', () => {
         }
     }
 
+    async function fetchActiveEmployees() {
+        try {
+            const data = await employeeService.getActiveEmployees();
+            console.log('Otrzymane dane aktywnych pracowników:', data);
+            employees.value = data;
+            console.log('Stan store po aktualizacji:', employees.value);
+            return data;
+        } catch (error) {
+            console.error('Błąd podczas pobierania aktywnych pracowników:', error);
+            throw error;
+        }
+    }
+
     return {
         employees,
         loading,
@@ -154,6 +167,7 @@ export const useEmployeesStore = defineStore('employees', () => {
         addEmployee,
         sendToTerminals,
         checkSync,
-        confirmSync
+        confirmSync,
+        fetchActiveEmployees
     };
 }); 

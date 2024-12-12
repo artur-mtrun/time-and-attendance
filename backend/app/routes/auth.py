@@ -15,7 +15,7 @@ from app.schemas.user import UserResponse
 
 router = APIRouter()
 
-@router.post("/login", response_model=LoginResponse)
+@router.post("/login")
 async def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db)

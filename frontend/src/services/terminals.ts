@@ -28,5 +28,10 @@ export const terminalService = {
 
     async syncTerminal(id: number): Promise<void> {
         await axios.post(`/api/ terminals/${id}/sync`);
+    },
+
+    async getActiveTerminals(): Promise<Terminal[]> {
+        const response = await axios.get<Terminal[]>('/api/terminals/active');
+        return response.data;
     }
 }; 

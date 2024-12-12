@@ -4,6 +4,24 @@
             <h2 class="text-2xl font-bold">Lista obecności</h2>
             <div class="flex space-x-4">
                 <div class="flex items-center space-x-2">
+                    <label class="text-sm font-medium text-gray-700">Pracownik:</label>
+                    <select 
+                        v-model="filter.employeeId"
+                        class="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        @change="fetchData"
+                    >
+                        <option value="">Wszyscy</option>
+                        <option 
+                            v-for="employee in employeesStore.employees" 
+                            :key="employee.id" 
+                            :value="employee.id"
+                        >
+                            {{ employee.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <div class="flex items-center space-x-2">
                     <label class="text-sm font-medium text-gray-700">Od:</label>
                     <input
                         type="date"
@@ -72,26 +90,43 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useAttendanceStore } from '@/stores/attendance';
-import { InOutModes, VerifyModes, InOutMode, VerifyMode } from '@/types/attendance';
+import { useEmployeesStore } from '@/stores/employees';
+import { InOutModes, VerifyModes, type InOutMode, type VerifyMode } from '@/types/attendance';
 
 const attendanceStore = useAttendanceStore();
+const employeesStore = useEmployeesStore();
+
+const getCurrentMonthRange = () => {
+    const now = new Date();
+    const startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    
+    return {
+        startDate: startDate.toISOString().split('T')[0],
+        endDate: endDate.toISOString().split('T')[0]
+    };
+};
 
 const filter = ref({
-    startDate: new Date().toISOString().split('T')[0],
-    endDate: new Date().toISOString().split('T')[0]
+    employeeId: '',
+    ...getCurrentMonthRange()
 });
 
-async function fetchData() {
-    await attendanceStore.fetchAttendanceLogs(filter.value);
-}
+const fetchData = async () => {
+    const employeeId = Number(filter.value.employeeId);
+    if (employeeId) {
+        await attendanceStore.fetchEmployeeAttendance(employeeId, filter.value);
+    } else {
+        await attendanceStore.fetchAttendanceLogs(filter.value);
+    }
+};
 
-onMounted(() => {
-    fetchData();
-});
-
-watch([() => filter.value.startDate, () => filter.value.endDate], () => {
-    fetchData();
+onMounted(async () => {
+    console.log('Mounting AttendanceList...');
+    await employeesStore.fetchActiveEmployees();
+    console.log('Active employees:', employeesStore.employees);
+    await fetchData();
 });
 </script> 

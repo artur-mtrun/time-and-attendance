@@ -3,6 +3,8 @@ from typing import List
 from ..services.scheduler import SchedulerService
 from ..scheduler import scheduler
 from pydantic import BaseModel
+#from ..models.job import JobInfo, JobUpdate
+from ..dependencies.auth import oauth2_scheme
 
 router = APIRouter(tags=["scheduler"])
 

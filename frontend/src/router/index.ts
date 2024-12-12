@@ -51,7 +51,7 @@ const router = createRouter({
                 {
                     path: 'attendance',
                     name: 'attendance',
-                    component: () => import('@/components/AttendanceList.vue')
+                    component: () => import('@/views/Attendance.vue')
                 },
                 {
                     path: 'attendance-all',

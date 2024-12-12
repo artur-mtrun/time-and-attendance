@@ -17,6 +17,19 @@ class AttendanceService:
             )
             .join(Employee, AttendanceLog.enroll_number == Employee.enroll_number)
             .join(Terminal, AttendanceLog.terminal_number == Terminal.number)
+            .with_entities(
+                AttendanceLog.id,
+                AttendanceLog.enroll_number,
+                AttendanceLog.terminal_number,
+                AttendanceLog.event_timestamp,
+                AttendanceLog.in_out_mode,
+                AttendanceLog.verify_mode,
+                AttendanceLog.work_code,
+                AttendanceLog.created_at,
+                AttendanceLog.updated_at,
+                Employee.name.label('employee_name'),
+                Terminal.name.label('terminal_name')
+            )
         )
 
         if start_date and end_date:

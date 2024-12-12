@@ -1,6 +1,30 @@
 <template>
+    
     <div class="p-4">
         <h1 class="text-2xl font-bold mb-6">Synchronizacja pracowników</h1>
+        
+        <!-- Dodane checkboxy -->
+        <div class="mb-4 flex space-x-6">
+            <label class="flex items-center space-x-2">
+                <input 
+                    type="checkbox" 
+                    v-model="showOnlyActive.employees"
+                    @change="refreshEmployees"
+                    class="rounded border-gray-300"
+                >
+                <span>Tylko aktywni pracownicy</span>
+            </label>
+
+            <label class="flex items-center space-x-2">
+                <input 
+                    type="checkbox" 
+                    v-model="showOnlyActive.terminals"
+                    @change="refreshTerminals"
+                    class="rounded border-gray-300"
+                >
+                <span>Tylko aktywne terminale</span>
+            </label>
+        </div>
         
         <!-- Alert Message -->
         <AlertMessage
@@ -91,46 +115,52 @@
             </div>
 
             <!-- Prawa kolumna - Pracownicy -->
-            <div class="bg-white rounded-lg shadow p-4">
-                <h2 class="text-lg font-semibold mb-4">Pracownicy</h2>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full">
-                        <thead>
-                            <tr class="bg-gray-50">
-                                <th class="w-10 px-4 py-2">
-                                    <input 
-                                        type="checkbox" 
-                                        v-model="allEmployeesSelected"
-                                        @change="toggleAllEmployees"
-                                        class="rounded border-gray-300"
-                                    >
+            <div class="bg-white rounded-lg shadow p-4 col-span-1">
+                <h2 class="text-lg font-semibold mb-4">
+                    Pracownicy ({{ employeesStore.employees?.length || 0 }})
+                </h2>
+                
+                <div v-if="employeesStore.loading">Ładowanie...</div>
+                
+                <div v-else-if="!employeesStore.employees?.length">
+                    Brak pracowników do wyświetlenia
+                </div>
+                
+                <div v-else ref="parentRef" class="h-[600px] overflow-auto w-full">
+                    <table class="min-w-full table-fixed">
+                        <thead class="bg-gray-50 sticky top-0 z-10">
+                            <tr>
+                                <th class="w-10 px-4 py-2 align-middle">
+                                    <input type="checkbox" v-model="allEmployeesSelected" @change="toggleAllEmployees" class="rounded border-gray-300">
                                 </th>
-                                <th class="px-4 py-2 text-left">Nr</th>
-                                <th class="px-4 py-2 text-left">Imię i nazwisko</th>
-                                <th class="px-4 py-2 text-left">Nr karty</th>
-                                <th class="px-4 py-2 text-left">Status</th>
+                                <th class="w-24 px-4 py-2 text-center align-middle">Nr</th>
+                                <th class="w-96 px-4 py-2 text-center align-middle">Imię i nazwisko</th>
+                                <th class="w-32 px-4 py-2 text-center align-middle">Nr karty</th>
+                                <th class="w-32 px-4 py-2 text-center align-middle">Status</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr v-for="employee in employeesStore.employees" :key="employee.id" class="border-t">
-                                <td class="px-4 py-2">
-                                    <input 
-                                        type="checkbox" 
-                                        v-model="selectedEmployees"
-                                        :value="employee.id"
-                                        class="rounded border-gray-300"
-                                    >
+                        <tbody class="relative" :style="{ height: virtualizer ? `${virtualizer.getTotalSize()}px` : '0px' }">
+                            <tr v-for="virtualRow in virtualizer ? virtualizer.getVirtualItems() : []"
+                                :key="virtualRow.key.toString()"
+                                class="absolute w-full border-t"
+                                :style="{
+                                    height: `${virtualRow.size}px`,
+                                    transform: `translateY(${virtualRow.start}px)`
+                                }"
+                            >
+                                <td class="w-10 px-4 py-2 align-middle">
+                                    <input type="checkbox" v-model="selectedEmployees" :value="employeesStore.employees[virtualRow.index].id" class="rounded border-gray-300">
                                 </td>
-                                <td class="px-4 py-2">{{ employee.enroll_number }}</td>
-                                <td class="px-4 py-2">{{ employee.name }}</td>
-                                <td class="px-4 py-2">{{ employee.card_number }}</td>
-                                <td class="px-4 py-2">
+                                <td class="w-24 px-4 py-2 text-right align-middle">{{ employeesStore.employees[virtualRow.index].enroll_number }}</td>
+                                <td class="w-96 px-4 py-2 text-left align-middle">{{ employeesStore.employees[virtualRow.index].name }}</td>
+                                <td class="w-32 px-4 py-2 text-right align-middle">{{ employeesStore.employees[virtualRow.index].card_number }}</td>
+                                <td class="w-24 px-4 py-2 text-right align-middle">
                                     <span :class="{
                                         'px-2 py-1 rounded text-sm': true,
-                                        'bg-green-100 text-green-800': employee.is_active,
-                                        'bg-red-100 text-red-800': !employee.is_active
+                                        'bg-green-100 text-green-800': employeesStore.employees[virtualRow.index].is_active,
+                                        'bg-red-100 text-red-800': !employeesStore.employees[virtualRow.index].is_active
                                     }">
-                                        {{ employee.is_active ? 'Aktywny' : 'Nieaktywny' }}
+                                        {{ employeesStore.employees[virtualRow.index].is_active ? 'Aktywny' : 'Nieaktywny' }}
                                     </span>
                                 </td>
                             </tr>
@@ -141,10 +171,10 @@
         </div>
 
         <div v-if="showSyncDialog" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div class="bg-white rounded-lg shadow-xl p-6 max-w-2xl w-full mx-4">
+            <div class="bg-white rounded-lg shadow-xl p-6 max-w-2xl w-full mx-4 max-h-[80vh] flex flex-col">
                 <h2 class="text-xl font-bold mb-4">Potwierdzenie synchronizacji</h2>
                 
-                <div v-if="syncData">
+                <div v-if="syncData" class="overflow-y-auto flex-1">
                     <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4">
                         {{ syncData.message }}
                         <ul class="mt-2 list-disc list-inside">
@@ -174,7 +204,7 @@
                     </div>
                 </div>
 
-                <div class="flex justify-end space-x-4 mt-6">
+                <div class="flex justify-end space-x-4 mt-6 pt-4 border-t">
                     <button 
                         @click="showSyncDialog = false"
                         class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
@@ -233,12 +263,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch, shallowRef } from 'vue';
 import { useTerminalsStore } from '@/stores/terminals';
 import { useEmployeesStore } from '@/stores/employees';
 import AlertMessage from '@/components/AlertMessage.vue';
 import { employeeService } from '@/services/employees';
-import axios from 'axios';
+import { useVirtualizer } from '@tanstack/vue-virtual'
 
 const terminalsStore = useTerminalsStore();
 const employeesStore = useEmployeesStore();
@@ -262,18 +292,58 @@ const sendReport = ref<{
     }>;
 }>({ message: '', details: [] });
 
-// Załaduj dane przy montowaniu komponentu
+const showOnlyActive = ref({
+    employees: false,
+    terminals: true
+});
+
+const parentRef = ref<HTMLElement | null>(null)
+const rowCount = computed(() => employeesStore.employees?.length || 0)
+
+// Inicjalizacja bez reactive refs
+let virtualizer: any = null;
+
+onMounted(() => {
+    virtualizer = useVirtualizer({
+        count: employeesStore.employees?.length || 0,
+        getScrollElement: () => parentRef.value,
+        estimateSize: () => 40,
+        overscan: 5,
+        getItemKey: (index) => employeesStore.employees[index]?.id || index
+    })
+})
+
+// Watch na zmiany danych
+watch(() => employeesStore.employees, () => {
+    if (virtualizer) {
+        virtualizer = useVirtualizer({
+            count: employeesStore.employees?.length || 0,
+            getScrollElement: () => parentRef.value,
+            estimateSize: () => 40,
+            overscan: 5,
+            getItemKey: (index) => employeesStore.employees[index]?.id || index
+        })
+    }
+}, { deep: true })
+
+// Dodaj watch na showOnlyActive
+watch(() => showOnlyActive.value.employees, async () => {
+    await refreshEmployees()
+}, { immediate: true })
+
+// Załaduj dane przy montowaniu
 onMounted(async () => {
     try {
         await Promise.all([
-            terminalsStore.fetchTerminals(),
-            employeesStore.fetchEmployees()
-        ]);
-        console.log('Załadowane terminale:', terminalsStore.terminals);
+            refreshEmployees(),
+            refreshTerminals()
+        ])
     } catch (error) {
-        console.error('Błąd podczas ładowania danych:', error);
+        console.error('Błąd podczas inicjalizacji:', error)
+        alertMessage.value = 'Błąd podczas ładowania danych'
+        alertType.value = 'error'
     }
-});
+})
 
 const allTerminalsSelected = computed({
     get: () => selectedTerminals.value.length === terminalsStore.terminals.length,
@@ -423,6 +493,22 @@ async function fetchAttendanceFromTerminals() {
         alertType.value = 'error';
     } finally {
         isFetchingAttendance.value = false;
+    }
+}
+
+async function refreshEmployees() {
+    if (showOnlyActive.value.employees) {
+        await employeesStore.fetchActiveEmployees()
+    } else {
+        await employeesStore.fetchEmployees()
+    }
+}
+
+async function refreshTerminals() {
+    if (showOnlyActive.value.terminals) {
+        await terminalsStore.fetchActiveTerminals();
+    } else {
+        await terminalsStore.fetchTerminals();
     }
 }
 </script> 
