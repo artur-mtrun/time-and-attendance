@@ -1,14 +1,15 @@
 from sqlalchemy.orm import Session
-from app.models.user import User
-from app.services.auth import get_password_hash
+from ..models.user import User
+from .auth import AuthService
 
 def init_db(db: Session) -> None:
     """Initialize database with default admin user if no users exist"""
-    if not db.query(User).first():
-        default_user = User(
+    admin = db.query(User).filter(User.username == "admin").first()
+    if not admin:
+        admin = User(
             username="admin",
-            password_hash=get_password_hash("admin"),
-            is_admin=True
+            hashed_password=AuthService.get_password_hash("admin"),
+            is_active=True
         )
-        db.add(default_user)
+        db.add(admin)
         db.commit() 

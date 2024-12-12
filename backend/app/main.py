@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.database import engine, SessionLocal
 from app.services.db_init import init_db
 from app.scheduler import init_scheduler, scheduler
+from app.routes import sync
 
 
 
@@ -63,6 +64,7 @@ app.include_router(employees.router, prefix="/api")
 app.include_router(attendance.router, prefix="/api")
 app.include_router(attendance_all.router, prefix="/api")
 app.include_router(scheduler.router, prefix="/api")
+app.include_router(sync.router)
 
 # Inicjalizacja bazy danych
 init_db(SessionLocal())
