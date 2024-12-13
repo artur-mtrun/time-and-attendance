@@ -35,7 +35,7 @@ const router = createRouter({
                 {
                     path: 'terminals',
                     name: 'terminals',
-                    component: () => import('@/components/TerminalsList.vue')
+                    component: () => import('@/views/TerminalsView.vue')
                 },
                 {
                     path: 'employees',

@@ -26,4 +26,13 @@ export interface UpdateTerminalData {
     port?: number;
     is_active?: boolean;
     is_main?: boolean;
+}
+
+export interface TerminalFormData {
+    number: number;
+    name: string;
+    ip_address: string;
+    port: number;
+    is_active: boolean;
+    is_main: boolean;
 } 
