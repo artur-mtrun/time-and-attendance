@@ -38,10 +38,13 @@ app = FastAPI(
     openapi_url="/openapi.json",
     swagger_ui_oauth2_redirect_url="/oauth2-redirect",
     swagger_ui_init_oauth={
-        "usePkceWithAuthorizationCodeGrant": True,
+        "usePkceWithAuthorizationCodeGrant": False,
         "clientId": "swagger-ui",
     },
-    swagger_ui_parameters={"persistAuthorization": True}
+    swagger_ui_parameters={
+        "persistAuthorization": True,
+        "defaultModelsExpandDepth": -1
+    }
 )
 
 # Konfiguracja CORS - musi być pierwsza!
@@ -100,7 +103,11 @@ async def authenticate_requests(request: Request, call_next):
         "/docs",
         "/redoc",
         "/openapi.json",
-        "/oauth2-redirect"
+        "/oauth2-redirect",
+        "/docs/oauth2-redirect",
+        "/docs/swagger-ui-bundle.js",
+        "/docs/swagger-ui-standalone-preset.js",
+        "/docs/swagger-ui.css",
     ]
     
     path = request.url.path

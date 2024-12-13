@@ -25,6 +25,7 @@ router = APIRouter(
 
 # Ten endpoint nie powinien być zabezpieczony - służy do logowania
 @router.post("/login", response_model=LoginResponse)
+@router.post("/token", response_model=LoginResponse)
 @limiter.limit("5/minute")
 async def login(
     request: Request,

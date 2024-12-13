@@ -177,3 +177,131 @@ AttributeError: module 'bcrypt' has no attribute '__about__'
 2024-12-13 10:21:36,243 - app.main - DEBUG - Headers: Headers({'host': 'localhost:8000', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"Windows"', 'authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTczNDA4NzA4NH0.kB_e-OVV4Il-upBJfiocCXa-wawLjxNRPNqKg8bFM88', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0', 'accept': 'application/json', 'sec-ch-ua': '"Microsoft Edge";v="131", "Chromium";v="131", "Not_A Brand";v="24"', 'dnt': '1', 'sec-ch-ua-mobile': '?0', 'origin': 'http://localhost:5173', 'sec-fetch-site': 'same-site', 'sec-fetch-mode': 'cors', 'sec-fetch-dest': 'empty', 'referer': 'http://localhost:5173/', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'pl,en;q=0.9,en-GB;q=0.8,en-US;q=0.7', 'cookie': 'connect.sid=s%3AoLOAahZqPFBl69djmFzUPDZ3pFTjKxYY.MH2RBcWWoSHAnW2uAjZdKC%2BLFvgHdEXMCKoL36YAaok'})
 2024-12-13 10:21:36,243 - app.main - DEBUG - Client host: 127.0.0.1
 2024-12-13 10:21:36,259 - app.main - DEBUG - Status odpowiedzi: 200
+2024-12-13 10:23:02,617 - app.main - DEBUG - Checking path: /docs
+2024-12-13 10:23:02,618 - app.main - DEBUG - Przychodzący request: GET http://localhost:8000/docs
+2024-12-13 10:23:02,619 - app.main - DEBUG - Headers: Headers({'host': 'localhost:8000', 'connection': 'keep-alive', 'cache-control': 'max-age=0', 'sec-ch-ua': '"Microsoft Edge";v="131", "Chromium";v="131", "Not_A Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'dnt': '1', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'pl,en;q=0.9,en-GB;q=0.8,en-US;q=0.7', 'cookie': 'connect.sid=s%3AoLOAahZqPFBl69djmFzUPDZ3pFTjKxYY.MH2RBcWWoSHAnW2uAjZdKC%2BLFvgHdEXMCKoL36YAaok'})
+2024-12-13 10:23:02,619 - app.main - DEBUG - Client host: 127.0.0.1
+2024-12-13 10:23:02,621 - app.main - DEBUG - Status odpowiedzi: 200
+2024-12-13 10:23:02,876 - app.main - DEBUG - Checking path: /openapi.json
+2024-12-13 10:23:02,877 - app.main - DEBUG - Przychodzący request: GET http://localhost:8000/openapi.json
+2024-12-13 10:23:02,877 - app.main - DEBUG - Headers: Headers({'host': 'localhost:8000', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"Windows"', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0', 'accept': 'application/json,*/*', 'sec-ch-ua': '"Microsoft Edge";v="131", "Chromium";v="131", "Not_A Brand";v="24"', 'dnt': '1', 'sec-ch-ua-mobile': '?0', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'cors', 'sec-fetch-dest': 'empty', 'referer': 'http://localhost:8000/docs', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'pl,en;q=0.9,en-GB;q=0.8,en-US;q=0.7', 'cookie': 'connect.sid=s%3AoLOAahZqPFBl69djmFzUPDZ3pFTjKxYY.MH2RBcWWoSHAnW2uAjZdKC%2BLFvgHdEXMCKoL36YAaok'})
+2024-12-13 10:23:02,878 - app.main - DEBUG - Client host: 127.0.0.1
+2024-12-13 10:23:02,927 - app.main - DEBUG - Status odpowiedzi: 200
+2024-12-13 10:23:09,613 - app.main - DEBUG - Checking path: /api/auth/token
+2024-12-13 10:24:01,676 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2024-12-13 10:24:01,676 - apscheduler.scheduler - INFO - Added job "Synchronize attendance logs" to job store "default"
+2024-12-13 10:24:01,676 - apscheduler.scheduler - INFO - Scheduler started
+2024-12-13 10:24:01,676 - apscheduler.scheduler - DEBUG - Looking for jobs to run
+2024-12-13 10:24:01,677 - apscheduler.scheduler - DEBUG - Next wakeup is due at 2024-12-13 11:24:01.675954+00:00 (in 3599.998898 seconds)
+2024-12-13 10:24:16,873 - app.main - DEBUG - Checking path: /api/auth/token
+2024-12-13 10:24:28,250 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2024-12-13 10:24:28,251 - apscheduler.scheduler - INFO - Added job "Synchronize attendance logs" to job store "default"
+2024-12-13 10:24:28,251 - apscheduler.scheduler - INFO - Scheduler started
+2024-12-13 10:24:28,252 - apscheduler.scheduler - DEBUG - Looking for jobs to run
+2024-12-13 10:24:28,253 - apscheduler.scheduler - DEBUG - Next wakeup is due at 2024-12-13 11:24:28.250882+00:00 (in 3599.997739 seconds)
+2024-12-13 10:24:35,044 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2024-12-13 10:24:35,045 - apscheduler.scheduler - INFO - Added job "Synchronize attendance logs" to job store "default"
+2024-12-13 10:24:35,045 - apscheduler.scheduler - INFO - Scheduler started
+2024-12-13 10:24:35,045 - apscheduler.scheduler - DEBUG - Looking for jobs to run
+2024-12-13 10:24:35,051 - apscheduler.scheduler - DEBUG - Next wakeup is due at 2024-12-13 11:24:35.044759+00:00 (in 3599.993075 seconds)
+2024-12-13 10:24:38,785 - app.main - DEBUG - Checking path: /api/auth/token
+2024-12-13 10:24:49,040 - app.main - DEBUG - Checking path: /openapi.json
+2024-12-13 10:24:49,041 - app.main - DEBUG - Przychodzący request: GET http://localhost:8000/openapi.json
+2024-12-13 10:24:49,041 - app.main - DEBUG - Headers: Headers({'host': 'localhost:8000', 'connection': 'keep-alive', 'sec-ch-ua': '"Microsoft Edge";v="131", "Chromium";v="131", "Not_A Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'dnt': '1', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'pl,en;q=0.9,en-GB;q=0.8,en-US;q=0.7', 'cookie': 'connect.sid=s%3AoLOAahZqPFBl69djmFzUPDZ3pFTjKxYY.MH2RBcWWoSHAnW2uAjZdKC%2BLFvgHdEXMCKoL36YAaok'})
+2024-12-13 10:24:49,042 - app.main - DEBUG - Client host: 127.0.0.1
+2024-12-13 10:24:49,081 - app.main - DEBUG - Status odpowiedzi: 200
+2024-12-13 10:25:08,214 - app.main - DEBUG - Checking path: /api/auth/token
+2024-12-13 10:26:07,631 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2024-12-13 10:26:07,632 - apscheduler.scheduler - INFO - Added job "Synchronize attendance logs" to job store "default"
+2024-12-13 10:26:07,632 - apscheduler.scheduler - INFO - Scheduler started
+2024-12-13 10:26:07,632 - apscheduler.scheduler - DEBUG - Looking for jobs to run
+2024-12-13 10:26:07,632 - apscheduler.scheduler - DEBUG - Next wakeup is due at 2024-12-13 11:26:07.631528+00:00 (in 3599.998893 seconds)
+2024-12-13 10:26:11,677 - app.main - DEBUG - Checking path: /api/auth/token
+2024-12-13 10:26:30,950 - app.main - DEBUG - Checking path: /api/auth/login
+2024-12-13 10:26:30,952 - app.main - DEBUG - Przychodzący request: POST http://localhost:8000/api/auth/login
+2024-12-13 10:26:30,952 - app.main - DEBUG - Headers: Headers({'host': 'localhost:8000', 'connection': 'keep-alive', 'content-length': '29', 'sec-ch-ua-platform': '"Windows"', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0', 'accept': 'application/json, text/plain, */*', 'sec-ch-ua': '"Microsoft Edge";v="131", "Chromium";v="131", "Not_A Brand";v="24"', 'content-type': 'application/x-www-form-urlencoded', 'dnt': '1', 'sec-ch-ua-mobile': '?0', 'origin': 'http://localhost:5173', 'sec-fetch-site': 'same-site', 'sec-fetch-mode': 'cors', 'sec-fetch-dest': 'empty', 'referer': 'http://localhost:5173/', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'pl,en;q=0.9,en-GB;q=0.8,en-US;q=0.7'})
+2024-12-13 10:26:30,952 - app.main - DEBUG - Client host: 127.0.0.1
+2024-12-13 10:26:30,956 - python_multipart.multipart - DEBUG - Calling on_field_start with no data
+2024-12-13 10:26:30,956 - python_multipart.multipart - DEBUG - Calling on_field_name with data[0:8]
+2024-12-13 10:26:30,956 - python_multipart.multipart - DEBUG - Calling on_field_data with data[9:14]
+2024-12-13 10:26:30,957 - python_multipart.multipart - DEBUG - Calling on_field_end with no data
+2024-12-13 10:26:30,957 - python_multipart.multipart - DEBUG - Calling on_field_start with no data
+2024-12-13 10:26:30,957 - python_multipart.multipart - DEBUG - Calling on_field_name with data[15:23]
+2024-12-13 10:26:30,957 - python_multipart.multipart - DEBUG - Calling on_field_data with data[24:29]
+2024-12-13 10:26:30,957 - python_multipart.multipart - DEBUG - Calling on_field_end with no data
+2024-12-13 10:26:30,958 - python_multipart.multipart - DEBUG - Calling on_end with no data
+2024-12-13 10:26:30,966 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/home/artur/time-and-attendance/backend/venv/lib/python3.10/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2024-12-13 10:26:30,969 - passlib.handlers.bcrypt - DEBUG - detected 'bcrypt' backend, version '<unknown>'
+2024-12-13 10:26:30,970 - passlib.handlers.bcrypt - DEBUG - 'bcrypt' backend lacks $2$ support, enabling workaround
+2024-12-13 10:26:31,251 - app.main - DEBUG - Status odpowiedzi: 200
+2024-12-13 10:26:31,305 - app.main - DEBUG - Checking path: /api/auth/me
+2024-12-13 10:26:31,306 - app.main - DEBUG - Przychodzący request: GET http://localhost:8000/api/auth/me
+2024-12-13 10:26:31,306 - app.main - DEBUG - Headers: Headers({'host': 'localhost:8000', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"Windows"', 'authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTczNDA4NzM5MX0.0kMI35sr5uLW8AbPztM8412PEynLTz5BlWRMC9McnWs', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0', 'accept': 'application/json, text/plain, */*', 'sec-ch-ua': '"Microsoft Edge";v="131", "Chromium";v="131", "Not_A Brand";v="24"', 'dnt': '1', 'sec-ch-ua-mobile': '?0', 'origin': 'http://localhost:5173', 'sec-fetch-site': 'same-site', 'sec-fetch-mode': 'cors', 'sec-fetch-dest': 'empty', 'referer': 'http://localhost:5173/', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'pl,en;q=0.9,en-GB;q=0.8,en-US;q=0.7'})
+2024-12-13 10:26:31,307 - app.main - DEBUG - Client host: 127.0.0.1
+2024-12-13 10:26:31,313 - app.main - DEBUG - Status odpowiedzi: 200
+2024-12-13 10:26:31,436 - app.main - DEBUG - Checking path: /api/terminals
+2024-12-13 10:26:31,437 - app.main - DEBUG - Przychodzący request: GET http://localhost:8000/api/terminals
+2024-12-13 10:26:31,437 - app.main - DEBUG - Headers: Headers({'host': 'localhost:8000', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"Windows"', 'authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTczNDA4NzM5MX0.0kMI35sr5uLW8AbPztM8412PEynLTz5BlWRMC9McnWs', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0', 'accept': 'application/json', 'sec-ch-ua': '"Microsoft Edge";v="131", "Chromium";v="131", "Not_A Brand";v="24"', 'dnt': '1', 'sec-ch-ua-mobile': '?0', 'origin': 'http://localhost:5173', 'sec-fetch-site': 'same-site', 'sec-fetch-mode': 'cors', 'sec-fetch-dest': 'empty', 'referer': 'http://localhost:5173/', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'pl,en;q=0.9,en-GB;q=0.8,en-US;q=0.7', 'cookie': 'connect.sid=s%3AoLOAahZqPFBl69djmFzUPDZ3pFTjKxYY.MH2RBcWWoSHAnW2uAjZdKC%2BLFvgHdEXMCKoL36YAaok'})
+2024-12-13 10:26:31,438 - app.main - DEBUG - Client host: 127.0.0.1
+2024-12-13 10:26:31,455 - app.main - DEBUG - Status odpowiedzi: 200
+2024-12-13 10:26:31,470 - app.main - DEBUG - Checking path: /api/employees
+2024-12-13 10:26:31,471 - app.main - DEBUG - Przychodzący request: GET http://localhost:8000/api/employees
+2024-12-13 10:26:31,471 - app.main - DEBUG - Headers: Headers({'host': 'localhost:8000', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"Windows"', 'authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTczNDA4NzM5MX0.0kMI35sr5uLW8AbPztM8412PEynLTz5BlWRMC9McnWs', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0', 'accept': 'application/json', 'sec-ch-ua': '"Microsoft Edge";v="131", "Chromium";v="131", "Not_A Brand";v="24"', 'dnt': '1', 'sec-ch-ua-mobile': '?0', 'origin': 'http://localhost:5173', 'sec-fetch-site': 'same-site', 'sec-fetch-mode': 'cors', 'sec-fetch-dest': 'empty', 'referer': 'http://localhost:5173/', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'pl,en;q=0.9,en-GB;q=0.8,en-US;q=0.7', 'cookie': 'connect.sid=s%3AoLOAahZqPFBl69djmFzUPDZ3pFTjKxYY.MH2RBcWWoSHAnW2uAjZdKC%2BLFvgHdEXMCKoL36YAaok'})
+2024-12-13 10:26:31,471 - app.main - DEBUG - Client host: 127.0.0.1
+2024-12-13 10:26:31,514 - app.services.employee - DEBUG - Pobrano 2170 pracowników
+2024-12-13 10:26:31,557 - app.main - DEBUG - Status odpowiedzi: 200
+2024-12-13 10:26:38,763 - app.main - DEBUG - Checking path: /docs
+2024-12-13 10:26:38,764 - app.main - DEBUG - Przychodzący request: GET http://localhost:8000/docs
+2024-12-13 10:26:38,764 - app.main - DEBUG - Headers: Headers({'host': 'localhost:8000', 'connection': 'keep-alive', 'cache-control': 'max-age=0', 'sec-ch-ua': '"Microsoft Edge";v="131", "Chromium";v="131", "Not_A Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"Windows"', 'dnt': '1', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'pl,en;q=0.9,en-GB;q=0.8,en-US;q=0.7', 'cookie': 'connect.sid=s%3AoLOAahZqPFBl69djmFzUPDZ3pFTjKxYY.MH2RBcWWoSHAnW2uAjZdKC%2BLFvgHdEXMCKoL36YAaok'})
+2024-12-13 10:26:38,764 - app.main - DEBUG - Client host: 127.0.0.1
+2024-12-13 10:26:38,766 - app.main - DEBUG - Status odpowiedzi: 200
+2024-12-13 10:26:38,872 - app.main - DEBUG - Checking path: /openapi.json
+2024-12-13 10:26:38,873 - app.main - DEBUG - Przychodzący request: GET http://localhost:8000/openapi.json
+2024-12-13 10:26:38,873 - app.main - DEBUG - Headers: Headers({'host': 'localhost:8000', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"Windows"', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0', 'accept': 'application/json,*/*', 'sec-ch-ua': '"Microsoft Edge";v="131", "Chromium";v="131", "Not_A Brand";v="24"', 'dnt': '1', 'sec-ch-ua-mobile': '?0', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'cors', 'sec-fetch-dest': 'empty', 'referer': 'http://localhost:8000/docs', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'pl,en;q=0.9,en-GB;q=0.8,en-US;q=0.7', 'cookie': 'connect.sid=s%3AoLOAahZqPFBl69djmFzUPDZ3pFTjKxYY.MH2RBcWWoSHAnW2uAjZdKC%2BLFvgHdEXMCKoL36YAaok'})
+2024-12-13 10:26:38,873 - app.main - DEBUG - Client host: 127.0.0.1
+2024-12-13 10:26:38,912 - app.main - DEBUG - Status odpowiedzi: 200
+2024-12-13 10:26:45,054 - app.main - DEBUG - Checking path: /api/auth/login
+2024-12-13 10:26:45,055 - app.main - DEBUG - Przychodzący request: POST http://localhost:8000/api/auth/login
+2024-12-13 10:26:45,056 - app.main - DEBUG - Headers: Headers({'host': 'localhost:8000', 'connection': 'keep-alive', 'content-length': '49', 'sec-ch-ua-platform': '"Windows"', 'authorization': 'Basic c3dhZ2dlci11aTo=', 'sec-ch-ua': '"Microsoft Edge";v="131", "Chromium";v="131", "Not_A Brand";v="24"', 'sec-ch-ua-mobile': '?0', 'x-requested-with': 'XMLHttpRequest', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0', 'accept': 'application/json, text/plain, */*', 'dnt': '1', 'content-type': 'application/x-www-form-urlencoded', 'origin': 'http://localhost:8000', 'sec-fetch-site': 'same-origin', 'sec-fetch-mode': 'cors', 'sec-fetch-dest': 'empty', 'referer': 'http://localhost:8000/docs', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'pl,en;q=0.9,en-GB;q=0.8,en-US;q=0.7', 'cookie': 'connect.sid=s%3AoLOAahZqPFBl69djmFzUPDZ3pFTjKxYY.MH2RBcWWoSHAnW2uAjZdKC%2BLFvgHdEXMCKoL36YAaok'})
+2024-12-13 10:26:45,056 - app.main - DEBUG - Client host: 127.0.0.1
+2024-12-13 10:26:45,059 - python_multipart.multipart - DEBUG - Calling on_field_start with no data
+2024-12-13 10:26:45,059 - python_multipart.multipart - DEBUG - Calling on_field_name with data[0:10]
+2024-12-13 10:26:45,059 - python_multipart.multipart - DEBUG - Calling on_field_data with data[11:19]
+2024-12-13 10:26:45,059 - python_multipart.multipart - DEBUG - Calling on_field_end with no data
+2024-12-13 10:26:45,060 - python_multipart.multipart - DEBUG - Calling on_field_start with no data
+2024-12-13 10:26:45,060 - python_multipart.multipart - DEBUG - Calling on_field_name with data[20:28]
+2024-12-13 10:26:45,060 - python_multipart.multipart - DEBUG - Calling on_field_data with data[29:34]
+2024-12-13 10:26:45,060 - python_multipart.multipart - DEBUG - Calling on_field_end with no data
+2024-12-13 10:26:45,060 - python_multipart.multipart - DEBUG - Calling on_field_start with no data
+2024-12-13 10:26:45,061 - python_multipart.multipart - DEBUG - Calling on_field_name with data[35:43]
+2024-12-13 10:26:45,061 - python_multipart.multipart - DEBUG - Calling on_field_data with data[44:49]
+2024-12-13 10:26:45,061 - python_multipart.multipart - DEBUG - Calling on_field_end with no data
+2024-12-13 10:26:45,061 - python_multipart.multipart - DEBUG - Calling on_end with no data
+2024-12-13 10:26:45,341 - app.main - DEBUG - Status odpowiedzi: 200
+2024-12-13 10:26:56,416 - app.main - DEBUG - Checking path: /api/terminals
+2024-12-13 10:26:56,417 - app.main - DEBUG - Przychodzący request: GET http://localhost:8000/api/terminals
+2024-12-13 10:26:56,417 - app.main - DEBUG - Headers: Headers({'host': 'localhost:8000', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"Windows"', 'authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTczNDA4NzM5MX0.0kMI35sr5uLW8AbPztM8412PEynLTz5BlWRMC9McnWs', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0', 'accept': 'application/json', 'sec-ch-ua': '"Microsoft Edge";v="131", "Chromium";v="131", "Not_A Brand";v="24"', 'dnt': '1', 'sec-ch-ua-mobile': '?0', 'origin': 'http://localhost:5173', 'sec-fetch-site': 'same-site', 'sec-fetch-mode': 'cors', 'sec-fetch-dest': 'empty', 'referer': 'http://localhost:5173/', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'pl,en;q=0.9,en-GB;q=0.8,en-US;q=0.7', 'cookie': 'connect.sid=s%3AoLOAahZqPFBl69djmFzUPDZ3pFTjKxYY.MH2RBcWWoSHAnW2uAjZdKC%2BLFvgHdEXMCKoL36YAaok'})
+2024-12-13 10:26:56,418 - app.main - DEBUG - Client host: 127.0.0.1
+2024-12-13 10:26:56,430 - app.main - DEBUG - Status odpowiedzi: 200
+2024-12-13 10:26:56,442 - app.main - DEBUG - Checking path: /api/employees
+2024-12-13 10:26:56,442 - app.main - DEBUG - Przychodzący request: GET http://localhost:8000/api/employees
+2024-12-13 10:26:56,442 - app.main - DEBUG - Headers: Headers({'host': 'localhost:8000', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"Windows"', 'authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTczNDA4NzM5MX0.0kMI35sr5uLW8AbPztM8412PEynLTz5BlWRMC9McnWs', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0', 'accept': 'application/json', 'sec-ch-ua': '"Microsoft Edge";v="131", "Chromium";v="131", "Not_A Brand";v="24"', 'dnt': '1', 'sec-ch-ua-mobile': '?0', 'origin': 'http://localhost:5173', 'sec-fetch-site': 'same-site', 'sec-fetch-mode': 'cors', 'sec-fetch-dest': 'empty', 'referer': 'http://localhost:5173/', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'pl,en;q=0.9,en-GB;q=0.8,en-US;q=0.7', 'cookie': 'connect.sid=s%3AoLOAahZqPFBl69djmFzUPDZ3pFTjKxYY.MH2RBcWWoSHAnW2uAjZdKC%2BLFvgHdEXMCKoL36YAaok'})
+2024-12-13 10:26:56,452 - app.main - DEBUG - Client host: 127.0.0.1
+2024-12-13 10:26:56,485 - app.services.employee - DEBUG - Pobrano 2170 pracowników
+2024-12-13 10:26:56,577 - app.main - DEBUG - Status odpowiedzi: 200
+2024-12-13 10:27:00,517 - app.main - DEBUG - Checking path: /api/employees
+2024-12-13 10:27:00,518 - app.main - DEBUG - Przychodzący request: GET http://localhost:8000/api/employees
+2024-12-13 10:27:00,519 - app.main - DEBUG - Headers: Headers({'host': 'localhost:8000', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"Windows"', 'authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTczNDA4NzM5MX0.0kMI35sr5uLW8AbPztM8412PEynLTz5BlWRMC9McnWs', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0', 'accept': 'application/json', 'sec-ch-ua': '"Microsoft Edge";v="131", "Chromium";v="131", "Not_A Brand";v="24"', 'dnt': '1', 'sec-ch-ua-mobile': '?0', 'origin': 'http://localhost:5173', 'sec-fetch-site': 'same-site', 'sec-fetch-mode': 'cors', 'sec-fetch-dest': 'empty', 'referer': 'http://localhost:5173/', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'pl,en;q=0.9,en-GB;q=0.8,en-US;q=0.7', 'cookie': 'connect.sid=s%3AoLOAahZqPFBl69djmFzUPDZ3pFTjKxYY.MH2RBcWWoSHAnW2uAjZdKC%2BLFvgHdEXMCKoL36YAaok'})
+2024-12-13 10:27:00,519 - app.main - DEBUG - Client host: 127.0.0.1
+2024-12-13 10:27:00,551 - app.services.employee - DEBUG - Pobrano 2170 pracowników
+2024-12-13 10:27:00,593 - app.main - DEBUG - Status odpowiedzi: 200
+2024-12-13 10:27:00,612 - app.main - DEBUG - Checking path: /api/employees
+2024-12-13 10:27:00,612 - app.main - DEBUG - Przychodzący request: GET http://localhost:8000/api/employees
+2024-12-13 10:27:00,612 - app.main - DEBUG - Headers: Headers({'host': 'localhost:8000', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"Windows"', 'authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTczNDA4NzM5MX0.0kMI35sr5uLW8AbPztM8412PEynLTz5BlWRMC9McnWs', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0', 'accept': 'application/json', 'sec-ch-ua': '"Microsoft Edge";v="131", "Chromium";v="131", "Not_A Brand";v="24"', 'dnt': '1', 'sec-ch-ua-mobile': '?0', 'origin': 'http://localhost:5173', 'sec-fetch-site': 'same-site', 'sec-fetch-mode': 'cors', 'sec-fetch-dest': 'empty', 'referer': 'http://localhost:5173/', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'pl,en;q=0.9,en-GB;q=0.8,en-US;q=0.7', 'cookie': 'connect.sid=s%3AoLOAahZqPFBl69djmFzUPDZ3pFTjKxYY.MH2RBcWWoSHAnW2uAjZdKC%2BLFvgHdEXMCKoL36YAaok'})
+2024-12-13 10:27:00,613 - app.main - DEBUG - Client host: 127.0.0.1
+2024-12-13 10:27:00,641 - app.services.employee - DEBUG - Pobrano 2170 pracowników
+2024-12-13 10:27:00,680 - app.main - DEBUG - Status odpowiedzi: 200

@@ -5,7 +5,10 @@ from typing import Optional
 from ..models.user import User
 from ..database import SessionLocal
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/token")
+oauth2_scheme = OAuth2PasswordBearer(
+    tokenUrl="api/auth/login",
+    scheme_name="JWT"
+)
 
 # Dodaj te stałe (użyj swoich wartości)
 SECRET_KEY = "your-secret-key"
