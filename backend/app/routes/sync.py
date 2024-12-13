@@ -7,15 +7,32 @@ from ..dependencies.auth import oauth2_scheme
 router = APIRouter(prefix="/api/sync", tags=["sync"])
 
 @router.post("/dbsyncattendance")
-async def dbsyncattendance(
-    db: Session = Depends(get_db),
-    token: str = Depends(oauth2_scheme)
-):
+def sync_attendance(db: Session = Depends(get_db)):
     """
-    Ręczna synchronizacja logów obecności między tabelami w bazie danych
+    Endpoint do synchronizacji logów obecności.
+    
+    Args:
+        db (Session): Sesja bazy danych wstrzykiwana przez FastAPI
+        
+    Returns:
+        dict: Słownik zawierający:
+            - status: Status operacji ("success" lub "error")
+            - message: Komunikat opisujący wynik operacji
+            - statystyki: Szczegółowe statystyki synchronizacji zawierające:
+                - przetworzone_rekordy: Liczba wszystkich przetworzonych rekordów
+                - dodane_nowe: Liczba nowo dodanych rekordów
+                - już_istniejące: Liczba rekordów, które już istniały
+                - bez_pracownika: Liczba rekordów bez przypisanego pracownika
+    
+    Raises:
+        HTTPException: W przypadku błędu podczas synchronizacji
     """
     try:
         result = SyncService.sync_attendance_logs(db)
-        return {"status": "success", "message": result["message"]}
+        return {
+            "status": "success",
+            "message": result["message"],
+            "statystyki": result["statystyki"]
+        }
     except Exception as e:
-        return {"status": "error", "message": str(e)} 
+        raise HTTPException(status_code=500, detail=str(e)) 

@@ -92,14 +92,20 @@ async def authenticate_requests(request: Request, call_next):
         
     # Lista dozwolonych ścieżek bez autoryzacji
     allowed_paths = [
+        "/api/",
         "/api/login",
         "/",
         "/docs",
         "/redoc",
         "/openapi.json",
         "/oauth2-redirect",
-        "/api/auth/token"
+        "/api/auth/token",
+        "/api/auth/me",
+        "/api/sync/dbsyncattendance"
     ]
+    path = request.url.path
+    logger.debug(f"Incoming path: {path}")
+    logger.debug(f"Allowed paths: {allowed_paths}")
     
     if request.url.path not in allowed_paths:
         token = request.headers.get("Authorization")
