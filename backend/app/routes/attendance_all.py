@@ -9,15 +9,20 @@ from app.services.zkteco_service import ZKTecoService
 from app.models.terminal import Terminal
 from app.models.attendance_all import AttendanceAll
 from pydantic import BaseModel
+from app.dependencies.auth import get_current_user
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(tags=["attendance_all"])
+router = APIRouter(
+    prefix="/attendance-all",
+    tags=["attendance_all"],
+    dependencies=[Depends(get_current_user)]
+)
 
 class TerminalIdsRequest(BaseModel):
     terminal_ids: List[int]
 
-@router.get("/attendance-all", response_model=List[AttendanceAllResponse])
+@router.get("/", response_model=List[AttendanceAllResponse])
 def get_attendance_all(
     start_date: str = Query(None),
     end_date: str = Query(None),
@@ -26,7 +31,7 @@ def get_attendance_all(
     logger.debug(f"Otrzymano żądanie z parametrami: start_date={start_date}, end_date={end_date}")
     return attendance_all_service.get_all(db, start_date, end_date)
 
-@router.post("/attendance-all/fetch-from-terminals")
+@router.post("/fetch-from-terminals")
 async def fetch_from_terminals(
     request: TerminalIdsRequest,
     db: Session = Depends(get_db)

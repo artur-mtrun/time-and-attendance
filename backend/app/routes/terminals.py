@@ -4,8 +4,14 @@ from typing import List
 from app.database import get_db
 from app.schemas.terminal import TerminalCreate, TerminalResponse, TerminalUpdate
 from app.services.terminal import TerminalService
+from app.dependencies.auth import get_current_user
+from app.models.user import User
 
-router = APIRouter(prefix="/terminals", tags=["terminals"])
+router = APIRouter(
+    prefix="/terminals", 
+    tags=["terminals"],
+    dependencies=[Depends(get_current_user)]
+)
 
 @router.get("", response_model=List[TerminalResponse])
 def get_terminals(db: Session = Depends(get_db)):

@@ -2,9 +2,13 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from ..dependencies.database import get_db
 from ..services.sync_service import SyncService
-from ..dependencies.auth import oauth2_scheme
+from ..dependencies.auth import get_current_user
 
-router = APIRouter(prefix="/api/sync", tags=["sync"])
+router = APIRouter(
+    prefix="/api/sync", 
+    tags=["sync"],
+    dependencies=[Depends(get_current_user)]
+)
 
 @router.post("/dbsyncattendance")
 def sync_attendance(db: Session = Depends(get_db)):

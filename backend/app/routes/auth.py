@@ -1,9 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi import APIRouter, Depends, HTTPException, status, Request
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from datetime import timedelta
 from ..dependencies.database import get_db
-from ..dependencies.auth import get_current_user
 from ..services.auth import (
     verify_password,
     create_access_token,
@@ -12,11 +11,23 @@ from ..services.auth import (
 from app.schemas.auth import LoginResponse
 from app.models.user import User
 from app.schemas.user import UserResponse
+from ..dependencies.auth import get_current_user
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
-router = APIRouter()
+limiter = Limiter(key_func=get_remote_address)
 
-@router.post("/login")
+# Zmień definicję routera
+router = APIRouter(
+    prefix="/auth",  # Dodaj prefix
+    tags=["auth"]
+)
+
+# Ten endpoint nie powinien być zabezpieczony - służy do logowania
+@router.post("/login", response_model=LoginResponse)
+@limiter.limit("5/minute")
 async def login(
+    request: Request,
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db)
 ):
@@ -33,9 +44,9 @@ async def login(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
     
-    return LoginResponse(access_token=access_token)
+    return {"access_token": access_token, "token_type": "bearer"}
 
-# Przykład chronionego endpointu
+# Ten endpoint jest zabezpieczony
 @router.get("/me", response_model=UserResponse)
 async def read_users_me(current_user: User = Depends(get_current_user)):
-    return current_user 
+    return current_user

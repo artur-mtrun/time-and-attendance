@@ -9,10 +9,11 @@ export const authService = {
         formData.append('username', data.username);
         formData.append('password', data.password);
 
-        const response = await axios.post<LoginResponse>(`${API_URL}/login`, formData, {
+        const response = await axios.post<LoginResponse>(`${API_URL}/auth/login`, formData, {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
+            withCredentials: false
         });
         
         localStorage.setItem('token', response.data.access_token);
@@ -21,7 +22,7 @@ export const authService = {
 
     async getCurrentUser(): Promise<User> {
         const token = localStorage.getItem('token');
-        const response = await axios.get<User>(`${API_URL}/me`, {
+        const response = await axios.get<User>(`${API_URL}/auth/me`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },

@@ -5,8 +5,13 @@ from datetime import datetime, timedelta
 from app.database import get_db
 from app.schemas.attendance import AttendanceResponse, AttendanceCreate
 from app.services.attendance import AttendanceService
+from app.dependencies.auth import get_current_user
 
-router = APIRouter(prefix="/attendance", tags=["attendance"])
+router = APIRouter(
+    prefix="/attendance", 
+    tags=["attendance"],
+    dependencies=[Depends(get_current_user)]
+)
 
 @router.get("", response_model=List[AttendanceResponse])
 def get_attendance_logs(

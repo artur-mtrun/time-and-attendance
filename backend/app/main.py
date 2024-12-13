@@ -6,6 +6,9 @@ from app.scheduler import init_scheduler, scheduler
 from app.routes import sync
 from starlette.responses import JSONResponse
 from app.dependencies.auth import oauth2_scheme
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
 import logging
 import sys
@@ -41,6 +44,20 @@ app = FastAPI(
     swagger_ui_parameters={"persistAuthorization": True}
 )
 
+# Konfiguracja CORS - musi być pierwsza!
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["*"],
+)
+
+# Inicjalizacja limitera
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
 # Middleware do logowania requestów
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
@@ -60,11 +77,45 @@ async def log_requests(request: Request, call_next):
 # Konfiguracja CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["http://localhost:5173"],  # Frontend URL
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["*"],  # Lub konkretne nagłówki: ["Authorization", "Content-Type"]
+    expose_headers=["*"]
 )
+
+
+
+@app.middleware("http")
+async def authenticate_requests(request: Request, call_next):
+    # Zawsze przepuszczaj OPTIONS dla CORS
+    if request.method == "OPTIONS":
+        response = await call_next(request)
+        return response
+        
+    # Lista dozwolonych ścieżek bez autoryzacji
+    allowed_paths = [
+        "/api/auth/login",
+        "/",
+        "/docs",
+        "/redoc",
+        "/openapi.json",
+        "/oauth2-redirect"
+    ]
+    
+    path = request.url.path
+    logger.debug(f"Checking path: {path}")
+    
+    if path not in allowed_paths:
+        token = request.headers.get("Authorization")
+        if not token or not token.startswith("Bearer "):
+            return JSONResponse(
+                status_code=401,
+                content={"detail": "Not authenticated"}
+            )
+    
+    response = await call_next(request)
+    return response
 
 # Dodaj routery
 app.include_router(auth.router, prefix="/api")
@@ -82,38 +133,3 @@ init_db(SessionLocal())
 @app.get("/")
 async def read_root():
     return {"Hello": "World"}
-
-@app.middleware("http")
-async def authenticate_requests(request: Request, call_next):
-    # Zawsze przepuszczaj OPTIONS dla CORS
-    if request.method == "OPTIONS":
-        response = await call_next(request)
-        return response
-        
-    # Lista dozwolonych ścieżek bez autoryzacji
-    allowed_paths = [
-        "/api/",
-        "/api/login",
-        "/",
-        "/docs",
-        "/redoc",
-        "/openapi.json",
-        "/oauth2-redirect",
-        "/api/auth/token",
-        "/api/auth/me",
-        "/api/sync/dbsyncattendance"
-    ]
-    path = request.url.path
-    logger.debug(f"Incoming path: {path}")
-    logger.debug(f"Allowed paths: {allowed_paths}")
-    
-    if request.url.path not in allowed_paths:
-        token = request.headers.get("Authorization")
-        if not token or not token.startswith("Bearer "):
-            return JSONResponse(
-                status_code=401,
-                content={"detail": "Not authenticated"}
-            )
-    
-    response = await call_next(request)
-    return response

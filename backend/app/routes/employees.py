@@ -8,12 +8,17 @@ from app.services.zkteco_service import ZKTecoService
 from app.services.terminal import TerminalService
 import logging
 from pydantic import BaseModel, validator, Field
+from app.dependencies.auth import get_current_user
 
 # Konfiguracja loggera
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-router = APIRouter(prefix="/employees", tags=["employees"])
+router = APIRouter(
+    prefix="/employees", 
+    tags=["employees"],
+    dependencies=[Depends(get_current_user)]
+)
 
 class SendToTerminalsRequest(BaseModel):
     terminal_ids: List[int] = Field(alias="terminalIds")
@@ -234,7 +239,7 @@ def send_to_terminals(request: SendToTerminalsRequest, db: Session = Depends(get
                 })
         
         return {
-            "message": f"Zakończono wysy��anie. Sukces: {success_count}, Błędy: {failed_count}",
+            "message": f"Zakończono wysyłanie. Sukces: {success_count}, Błędy: {failed_count}",
             "details": results
         }
         
