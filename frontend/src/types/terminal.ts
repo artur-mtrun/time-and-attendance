@@ -38,23 +38,21 @@ export interface TerminalFormData {
 }
 
 export interface SyncResult {
-  terminal_id: number;
-  terminal_name: string;
-  total_employees: number;
-  synced_employees: number;
-  sync_details: {
-    status: string;
-    message: string;
-    updated_count: number;
+  status: string;
+  message: string;
+  stats: {
+    terminal_id: number;
+    terminal_name: string;
+    total_employees: number;
+    synced_employees: number;
+    sync_details: {
+      status: string;
+      message: string;
+      updated_count: number;
+    };
+    changes: SyncChange[];
   };
-  changes: Array<{
-    employee: string;
-    enroll_number: string;
-    type: 'add' | 'update';
-    message?: string;
-    changes?: string[];
-  }>;
-} 
+}
 
 export interface SyncChange {
   type: 'add' | 'update';

@@ -124,7 +124,11 @@
       </div>
     </div>
 
-
+    <SyncResultModal
+      :show="!!syncResultMessage"
+      :message="syncResultMessage"
+      @close="syncResultMessage = ''"
+    />
   </div>
 </template>
 
@@ -136,6 +140,7 @@ import TerminalsList from '@/components/terminals/TerminalsList.vue';
 import TerminalModal from '@/components/terminals/TerminalModal.vue';
 import DeleteConfirmationModal from '@/components/terminals/DeleteConfirmationModal.vue';
 import TerminalsDashboard from '@/components/terminals/TerminalsDashboard.vue';
+import SyncResultModal from './SyncResultModal.vue';
 
 const emit = defineEmits<{
   alert: [message: string, type: 'error' | 'success' | 'warning']
@@ -157,6 +162,7 @@ const formData = ref({
 });
 const selectedTerminalIds = ref<number[]>([]);
 const syncingTerminals = ref<number[]>([]);
+const syncResultMessage = ref('');
 
 async function loadTerminals() {
   loading.value = true;
@@ -188,11 +194,32 @@ async function handleSubmit() {
 async function syncTerminal(terminal: Terminal) {
   syncingTerminal.value = terminal.id;
   try {
-    const result: SyncResult = await terminalsStore.syncTerminal(terminal.id);
-    emit('alert', `Synchronizacja terminala "${terminal.name}" zakończona pomyślnie`, 'success');
-    await loadTerminals();
+    const result = await terminalsStore.syncTerminal(terminal.id);
+    console.log('Raw sync result:', result);
+    
+    const stats = result.stats;
+    let detailMessage = `Synchronizacja terminala "${stats.terminal_name}":\n`;
+    detailMessage += `Zsynchronizowano ${stats.synced_employees} z ${stats.total_employees} pracowników\n\n`;
+    
+    if (stats.changes && stats.changes.length > 0) {
+      stats.changes.forEach((change: SyncChange) => {
+        if (change.type === 'add') {
+          detailMessage += `➕ ${change.employee} (${change.enroll_number}): ${change.message}\n`;
+        } else if (change.type === 'update') {
+          detailMessage += `📝 ${change.employee} (${change.enroll_number}):\n`;
+          change.changes?.forEach(changeDetail => {
+            detailMessage += `   - ${changeDetail}\n`;
+          });
+        }
+      });
+    } else {
+      detailMessage += "Brak zmian do synchronizacji";
+    }
+    
+    syncResultMessage.value = detailMessage;
   } catch (error: any) {
-    emit('alert', `Błąd synchronizacji terminala "${terminal.name}": ${error.response?.data?.detail || error.message}`, 'error');
+    console.error('Sync error:', error);
+    syncResultMessage.value = `Błąd synchronizacji terminala "${terminal.name}": ${error.response?.data?.detail || error.message}`;
   } finally {
     syncingTerminal.value = null;
   }
@@ -260,11 +287,11 @@ async function syncSelectedTerminals() {
       
       // Tworzenie szczegółowego raportu
       let detailMessage = `Synchronizacja terminala "${terminal?.name}":\n`;
-      detailMessage += `Zsynchronizowano ${result.synced_employees} z ${result.total_employees} pracowników\n\n`;
+      detailMessage += `Zsynchronizowano ${result.stats.synced_employees} z ${result.stats.total_employees} pracowników\n\n`;
       
       // Dodawanie szczegółów zmian
-      if (result.changes.length > 0) {
-        result.changes.forEach((change: SyncChange) => {
+      if (result.stats.changes.length > 0) {
+        result.stats.changes.forEach((change: SyncChange) => {
           if (change.type === 'add') {
             detailMessage += `➕ ${change.employee} (${change.enroll_number}): ${change.message}\n`;
           } else if (change.type === 'update') {
@@ -293,7 +320,7 @@ function confirmDeleteSelected() {
   if (selectedTerminalIds.value.length === 0) return;
   
   // Możesz utworzyć nowy modal do potwierdzenia masowego usuwania
-  // lub użyć istniejącego terminalToDelete w inny sposób
+  // lub użyć istniejcego terminalToDelete w inny sposób
 }
 
 onMounted(() => {
