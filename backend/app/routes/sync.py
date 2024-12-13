@@ -40,3 +40,28 @@ def sync_attendance(db: Session = Depends(get_db)):
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) 
+
+@router.post("/terminal/{terminal_id}")
+def sync_terminal(terminal_id: int, db: Session = Depends(get_db)):
+    """
+    Endpoint do synchronizacji pojedynczego terminala.
+    
+    Args:
+        terminal_id: ID terminala do synchronizacji
+        db: Sesja bazy danych
+        
+    Returns:
+        dict: Wynik synchronizacji zawierający:
+            - status: Status operacji
+            - message: Komunikat z wynikiem
+            - stats: Statystyki synchronizacji
+    """
+    try:
+        result = SyncService.sync_terminal(db, terminal_id)
+        return {
+            "status": "success",
+            "message": "Synchronizacja zakończona pomyślnie",
+            "stats": result
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e)) 

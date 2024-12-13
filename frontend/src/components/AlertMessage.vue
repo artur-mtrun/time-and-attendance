@@ -22,8 +22,8 @@
 
 <script setup lang="ts">
 defineProps<{
-    message: string | null;
-    type?: 'error' | 'success';
+    message: string;
+    type: 'error' | 'success' | 'warning';
 }>();
 
 defineEmits<{

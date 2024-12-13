@@ -185,3 +185,22 @@ class EmployeeService:
     def get_active_employees(db: Session):
         employees = db.query(Employee).filter(Employee.is_active == True).all()
         return employees  # Zwracamy pustą listę zamiast rzucać wyjątek
+
+    @staticmethod
+    def get_all_active_employees(db: Session):
+        """
+        Pobiera wszystkich aktywnych pracowników z bazy danych
+        
+        Args:
+            db: Sesja bazy danych
+            
+        Returns:
+            List[Employee]: Lista aktywnych pracowników
+        """
+        try:
+            employees = db.query(Employee).filter(Employee.is_active == True).all()
+            logger.debug(f"Pobrano {len(employees)} aktywnych pracowników")
+            return employees
+        except Exception as e:
+            logger.error(f"Błąd podczas pobierania aktywnych pracowników: {str(e)}")
+            raise

@@ -174,3 +174,52 @@ class ZKTecoService:
         except Exception as e:
             logger.error(f"Nieoczekiwany błąd: {str(e)}")
             raise
+
+    def send_employees_batch(self, terminal: Any, employees: List[Any]) -> Dict:
+        """
+        Wysyła grupę pracowników do terminala za pomocą batch API
+        
+        Args:
+            terminal: Obiekt terminala z danymi połączenia
+            employees: Lista pracowników do wysłania
+        """
+        try:
+            logger.info(f"Wysyłanie grupy pracowników do terminala: IP={terminal.ip_address}, Port={terminal.port}")
+            
+            # Przygotuj payload dla batch request
+            employees_data = [{
+                'enrollNumber': str(emp.enroll_number),
+                'name': emp.name,
+                'cardNumber': emp.card_number,
+                'password': '',
+                'privilege': emp.privileges,
+                'enabled': emp.is_active
+            } for emp in employees]
+            
+            payload = {
+                'ipAddress': terminal.ip_address,
+                'port': terminal.port,
+                'deviceNumber': terminal.number,
+                'employees': employees_data
+            }
+            
+            logger.debug(f"Wysyłam batch request do API ZKTeco: {payload}")
+            
+            response = requests.post(
+                f"{self.base_url}/api/Employee/save-batch",
+                json=payload,
+                timeout=self.timeout
+            )
+            
+            if response.status_code != 200:
+                raise Exception(f"Błąd API ZKTeco podczas batch save: {response.text}")
+            
+            return {
+                'status': 'success',
+                'message': f'Pomyślnie wysłano {len(employees)} pracowników',
+                'updated_count': len(employees)
+            }
+                
+        except Exception as e:
+            logger.error(f"Błąd podczas batch save do terminala {terminal.ip_address}: {str(e)}")
+            raise

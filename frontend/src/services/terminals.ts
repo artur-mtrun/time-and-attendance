@@ -1,5 +1,5 @@
 import axios from '../plugins/axios.js';
-import type { Terminal, CreateTerminalData, UpdateTerminalData } from '../types/terminal.js';
+import type { Terminal, CreateTerminalData, UpdateTerminalData, SyncResult } from '../types/terminal.js';
 
 export const terminalService = {
     async getTerminals(): Promise<Terminal[]> {
@@ -26,8 +26,9 @@ export const terminalService = {
         await axios.delete(`/api/terminals/${id}`);
     },
 
-    async syncTerminal(id: number): Promise<void> {
-        await axios.post(`/api/ terminals/${id}/sync`);
+    async syncTerminal(id: number): Promise<SyncResult> {
+        const response = await axios.post<SyncResult>(`/api/sync/terminal/${id}`);
+        return response.data;
     },
 
     async getActiveTerminals(): Promise<Terminal[]> {

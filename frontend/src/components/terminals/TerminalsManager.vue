@@ -123,20 +123,22 @@
         </div>
       </div>
     </div>
+
+
   </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { useTerminalsStore } from '@/stores/terminals';
-import type { Terminal } from '@/types/terminal';
+import type { Terminal, SyncResult, SyncChange } from '@/types/terminal';
 import TerminalsList from '@/components/terminals/TerminalsList.vue';
 import TerminalModal from '@/components/terminals/TerminalModal.vue';
 import DeleteConfirmationModal from '@/components/terminals/DeleteConfirmationModal.vue';
 import TerminalsDashboard from '@/components/terminals/TerminalsDashboard.vue';
 
 const emit = defineEmits<{
-  alert: [message: string, type: 'error' | 'success']
+  alert: [message: string, type: 'error' | 'success' | 'warning']
 }>();
 
 const terminalsStore = useTerminalsStore();
@@ -154,6 +156,7 @@ const formData = ref({
     is_main: false
 });
 const selectedTerminalIds = ref<number[]>([]);
+const syncingTerminals = ref<number[]>([]);
 
 async function loadTerminals() {
   loading.value = true;
@@ -185,11 +188,11 @@ async function handleSubmit() {
 async function syncTerminal(terminal: Terminal) {
   syncingTerminal.value = terminal.id;
   try {
-    await terminalsStore.syncTerminal(terminal.id);
-    emit('alert', 'Synchronizacja zakończona pomyślnie', 'success');
+    const result: SyncResult = await terminalsStore.syncTerminal(terminal.id);
+    emit('alert', `Synchronizacja terminala "${terminal.name}" zakończona pomyślnie`, 'success');
     await loadTerminals();
   } catch (error: any) {
-    emit('alert', error.response?.data?.detail || 'Nie udało się zsynchronizować czytnika', 'error');
+    emit('alert', `Błąd synchronizacji terminala "${terminal.name}": ${error.response?.data?.detail || error.message}`, 'error');
   } finally {
     syncingTerminal.value = null;
   }
@@ -243,19 +246,46 @@ const handleSelectionChange = (ids: number[]) => {
 };
 
 async function syncSelectedTerminals() {
-  if (selectedTerminalIds.value.length === 0) return;
-  
+  if (selectedTerminalIds.value.length === 0) {
+    emit('alert', 'Nie wybrano żadnych terminali do synchronizacji', 'warning');
+    return;
+  }
+
   for (const id of selectedTerminalIds.value) {
-    syncingTerminal.value = id;
+    syncingTerminals.value.push(id);
+    const terminal = terminalsStore.terminals.find(t => t.id === id);
+    
     try {
-      await terminalsStore.syncTerminal(id);
+      const result: SyncResult = await terminalsStore.syncTerminal(id);
+      
+      // Tworzenie szczegółowego raportu
+      let detailMessage = `Synchronizacja terminala "${terminal?.name}":\n`;
+      detailMessage += `Zsynchronizowano ${result.synced_employees} z ${result.total_employees} pracowników\n\n`;
+      
+      // Dodawanie szczegółów zmian
+      if (result.changes.length > 0) {
+        result.changes.forEach((change: SyncChange) => {
+          if (change.type === 'add') {
+            detailMessage += `➕ ${change.employee} (${change.enroll_number}): ${change.message}\n`;
+          } else if (change.type === 'update') {
+            detailMessage += `📝 ${change.employee} (${change.enroll_number}):\n`;
+            change.changes?.forEach(changeDetail => {
+              detailMessage += `   - ${changeDetail}\n`;
+            });
+          }
+        });
+      } else {
+        detailMessage += "Brak zmian do synchronizacji";
+      }
+      
+      emit('alert', detailMessage, 'success');
     } catch (error: any) {
-      emit('alert', `Błąd synchronizacji terminala ${id}: ${error.message}`, 'error');
+      emit('alert', `Błąd synchronizacji terminala "${terminal?.name}": ${error.response?.data?.detail || error.message}`, 'error');
+    } finally {
+      syncingTerminals.value = syncingTerminals.value.filter(t => t !== id);
     }
   }
   
-  syncingTerminal.value = null;
-  emit('alert', 'Synchronizacja zakończona', 'success');
   await loadTerminals();
 }
 

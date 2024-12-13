@@ -3,7 +3,7 @@
         <label class="flex items-center">
             <input
                 :checked="isActive"
-                @change="e => $emit('update:isActive', (e.target as HTMLInputElement).checked)"
+                @change="(e: Event) => $emit('update:isActive', (e.target as HTMLInputElement).checked)"
                 type="checkbox"
                 class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             />
@@ -12,7 +12,7 @@
         <label class="flex items-center">
             <input
                 :checked="isMain"
-                @change="e => $emit('update:isMain', (e.target as HTMLInputElement).checked)"
+                @change="(e: Event) => $emit('update:isMain', (e.target as HTMLInputElement).checked)"
                 type="checkbox"
                 class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             />

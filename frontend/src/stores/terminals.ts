@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import type { Terminal, CreateTerminalData } from '@/types/terminal.js';
+import type { Terminal, CreateTerminalData, SyncResult } from '@/types/terminal.js';
 import { terminalService } from '@/services/terminals.js';
+import axios from 'axios';
 
 export const useTerminalsStore = defineStore('terminals', () => {
     const terminals = ref<Terminal[]>([]);
@@ -66,17 +67,11 @@ export const useTerminalsStore = defineStore('terminals', () => {
         }
     }
 
-    async function syncTerminal(id: number) {
-        loading.value = true;
-        error.value = null;
+    async function syncTerminal(id: number): Promise<SyncResult> {
         try {
-            await terminalService.syncTerminal(id);
-            await fetchTerminals(); // Odświeżamy listę po synchronizacji
-        } catch (err: any) {
-            error.value = err.response?.data?.detail || 'Nie udało się zsynchronizować czytnika';
-            throw err;
-        } finally {
-            loading.value = false;
+            return await terminalService.syncTerminal(id);
+        } catch (error) {
+            throw error;
         }
     }
 

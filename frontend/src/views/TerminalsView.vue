@@ -17,9 +17,9 @@ import AlertMessage from '@/components/AlertMessage.vue';
 import TerminalsManager from '../components/terminals/TerminalsManager.vue';
 
 const alertMessage = ref('');
-const alertType = ref<'error' | 'success'>('error');
+const alertType = ref<'error' | 'success' | 'warning'>('error');
 
-const handleAlert = (message: string, type: 'error' | 'success') => {
+const handleAlert = (message: string, type: 'error' | 'success' | 'warning') => {
   alertMessage.value = message;
   alertType.value = type;
 };
