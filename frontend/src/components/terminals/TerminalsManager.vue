@@ -1,14 +1,11 @@
 <template>
   <div>
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="text-2xl font-bold">Lista czytników</h2>
-      <button
-        @click="showCreateModal = true"
-        class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-      >
-        Dodaj czytnik
-      </button>
-    </div>
+    <TerminalsDashboard
+      :selected-count="selectedTerminalIds.length"
+      @add="showCreateModal = true"
+      @sync-selected="syncSelectedTerminals"
+      @delete-selected="confirmDeleteSelected"
+    />
 
     <TerminalsList 
       :loading="loading"
@@ -136,6 +133,7 @@ import type { Terminal } from '@/types/terminal';
 import TerminalsList from '@/components/terminals/TerminalsList.vue';
 import TerminalModal from '@/components/terminals/TerminalModal.vue';
 import DeleteConfirmationModal from '@/components/terminals/DeleteConfirmationModal.vue';
+import TerminalsDashboard from '@/components/terminals/TerminalsDashboard.vue';
 
 const emit = defineEmits<{
   alert: [message: string, type: 'error' | 'success']
@@ -243,6 +241,30 @@ async function deleteTerminal() {
 const handleSelectionChange = (ids: number[]) => {
   selectedTerminalIds.value = ids;
 };
+
+async function syncSelectedTerminals() {
+  if (selectedTerminalIds.value.length === 0) return;
+  
+  for (const id of selectedTerminalIds.value) {
+    syncingTerminal.value = id;
+    try {
+      await terminalsStore.syncTerminal(id);
+    } catch (error: any) {
+      emit('alert', `Błąd synchronizacji terminala ${id}: ${error.message}`, 'error');
+    }
+  }
+  
+  syncingTerminal.value = null;
+  emit('alert', 'Synchronizacja zakończona', 'success');
+  await loadTerminals();
+}
+
+function confirmDeleteSelected() {
+  if (selectedTerminalIds.value.length === 0) return;
+  
+  // Możesz utworzyć nowy modal do potwierdzenia masowego usuwania
+  // lub użyć istniejącego terminalToDelete w inny sposób
+}
 
 onMounted(() => {
     loadTerminals();
