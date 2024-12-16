@@ -1,5 +1,5 @@
 import axios from 'axios';
-
+import router from '../router/index.js';
 
 const instance = axios.create({
     baseURL: 'http://localhost:8000',
@@ -26,7 +26,7 @@ instance.interceptors.request.use(config => {
     return config;
 });
 
-// Dodajemy interceptor do logowania odpowiedzi
+// Dodajemy interceptor do logowania odpowiedzi i obsługi błędów autoryzacji
 instance.interceptors.response.use(
     response => {
         console.log('Response:', {
@@ -42,6 +42,14 @@ instance.interceptors.response.use(
             data: error.response?.data,
             config: error.config
         });
+
+        // Obsługa błędu 401 Unauthorized
+        if (error.response && error.response.status === 401) {
+            console.log('Unauthorized - clearing token and redirecting to login');
+            localStorage.removeItem('token'); // Wyczyść token
+            router.push('/login'); // Przekieruj do strony logowania
+        }
+
         return Promise.reject(error);
     }
 );
