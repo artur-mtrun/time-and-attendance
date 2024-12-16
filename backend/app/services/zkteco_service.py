@@ -6,6 +6,7 @@ from app.services.terminal import TerminalService
 from sqlalchemy.orm import Session
 from requests.exceptions import Timeout, ConnectionError
 from fastapi import HTTPException
+from ..models.terminal import Terminal
 
 # Konfiguracja loggera
 logger = logging.getLogger(__name__)
@@ -222,4 +223,30 @@ class ZKTecoService:
                 
         except Exception as e:
             logger.error(f"Błąd podczas batch save do terminala {terminal.ip_address}: {str(e)}")
+            raise
+
+    def delete_employee(self, terminal: Terminal, enroll_number: str) -> Dict[str, Any]:
+        """
+        Usuwa pracownika z terminala
+        """
+        try:
+            payload = {
+                "ipAddress": terminal.ip_address,
+                "port": terminal.port,
+                "deviceNumber": terminal.number,
+                "enrollNumber": str(enroll_number)
+            }
+            
+            response = requests.post(
+                f"{self.base_url}/api/Employee/delete",
+                json=payload,
+                timeout=self.timeout
+            )
+            
+            if response.status_code != 200:
+                raise Exception(f"Błąd API ZKTeco: {response.text}")
+            
+            return response.json()
+        except Exception as e:
+            logger.error(f"Błąd podczas usuwania pracownika {enroll_number} z terminala: {str(e)}")
             raise

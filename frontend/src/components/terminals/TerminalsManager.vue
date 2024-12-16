@@ -210,6 +210,8 @@ async function syncTerminal(terminal: Terminal) {
           change.changes?.forEach(changeDetail => {
             detailMessage += `   - ${changeDetail}\n`;
           });
+        } else if (change.type === 'delete') {
+          detailMessage += `❌ ${change.employee} (${change.enroll_number}): ${change.message}\n`;
         }
       });
     } else {
@@ -299,6 +301,8 @@ async function syncSelectedTerminals() {
             change.changes?.forEach(changeDetail => {
               detailMessage += `   - ${changeDetail}\n`;
             });
+          } else if (change.type === 'delete') {
+            detailMessage += `❌ ${change.employee} (${change.enroll_number}): ${change.message}\n`;
           }
         });
       } else {

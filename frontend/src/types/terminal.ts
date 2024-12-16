@@ -55,7 +55,7 @@ export interface SyncResult {
 }
 
 export interface SyncChange {
-  type: 'add' | 'update';
+  type: 'add' | 'update' | 'delete';
   employee: string;
   enroll_number: string;
   message?: string;

@@ -34,6 +34,25 @@ class SyncService:
             # Pobierz pracowników z bazy danych
             db_employees = EmployeeService.get_all_active_employees(db)
             
+            # Mapowanie pracowników
+            terminal_emp_map = {str(emp['enrollNumber']): emp for emp in terminal_employees}
+            db_emp_map = {str(emp.enroll_number): emp for emp in db_employees}
+            
+            employees_to_sync = []
+            changes_details = []
+            
+            # Sprawdź pracowników do usunięcia (są w terminalu, ale nie ma ich w bazie)
+            for terminal_emp in terminal_employees:
+                if str(terminal_emp['enrollNumber']) not in db_emp_map:
+                    # Usuń pracownika z terminala
+                    zkteco_service.delete_employee(terminal, terminal_emp['enrollNumber'])
+                    changes_details.append({
+                        "employee": terminal_emp['name'],
+                        "enroll_number": terminal_emp['enrollNumber'],
+                        "type": "delete",
+                        "message": "Usunięto pracownika z terminala (brak w bazie danych)"
+                    })
+            
             # Mapowanie pracowników z terminala po numerze ewidencyjnym
             terminal_emp_map = {str(emp['enrollNumber']): emp for emp in terminal_employees}
             
