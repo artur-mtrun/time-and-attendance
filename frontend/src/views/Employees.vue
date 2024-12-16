@@ -1,30 +1,26 @@
 <template>
-    <div>
-        <h1>Pracownicy</h1>
-        <employee-list 
-            :employees="employees" 
-            @refresh="loadEmployees"
-        />
-    </div>
+  <div class="p-4">
+    <AlertMessage
+      :message="alertMessage"
+      :type="alertType"
+      @close="alertMessage = ''"
+    />
+    <EmployeesManager
+      @alert="handleAlert"
+    />
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import EmployeeList from '@/components/EmployeesList.vue';
-import { employeeService } from '../services/employees';
-import type { Employee } from '@/types/employee';
+import { ref } from 'vue';
+import AlertMessage from '@/components/AlertMessage.vue';
+import EmployeesManager from '@/components/employees/EmployeesManager.vue';
 
-const employees = ref<Employee[]>([]);
+const alertMessage = ref('');
+const alertType = ref<'error' | 'success' | 'warning'>('error');
 
-const loadEmployees = async () => {
-    try {
-        employees.value = await employeeService.getEmployees();
-    } catch (error) {
-        console.error('Błąd podczas ładowania pracowników:', error);
-    }
+const handleAlert = (message: string, type: 'error' | 'success' | 'warning') => {
+  alertMessage.value = message;
+  alertType.value = type;
 };
-
-onMounted(() => {
-    loadEmployees();
-});
 </script> 
