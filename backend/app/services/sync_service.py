@@ -63,10 +63,6 @@ class SyncService:
             for db_emp in db_employees:
                 terminal_emp = terminal_emp_map.get(str(db_emp.enroll_number))
                 
-                # Jeśli pracownik jest nieaktywny, wyczyść jego dane dostępowe w obiekcie
-                if not db_emp.is_active:
-                    db_emp.card_number = None
-                    db_emp.password = None
                 
                 # Zawsze dodaj pracownika do synchronizacji jeśli go nie ma w terminalu
                 if not terminal_emp:
@@ -82,8 +78,7 @@ class SyncService:
                     terminal_emp['name'] != db_emp.name or
                     terminal_emp['cardNumber'] != db_emp.card_number or
                     terminal_emp['enabled'] != db_emp.is_active or
-                    terminal_emp['privilege'] != db_emp.privileges or
-                    not db_emp.is_active  # Dodaj do synchronizacji zawsze gdy pracownik jest nieaktywny
+                    terminal_emp['privilege'] != db_emp.privileges
                 ):
                     employees_to_sync.append(db_emp)
                     changes = []
@@ -95,8 +90,6 @@ class SyncService:
                         changes.append(f"status: {terminal_emp['enabled']} -> {db_emp.is_active}")
                     if terminal_emp['privilege'] != db_emp.privileges:
                         changes.append(f"uprawnienia: {terminal_emp['privilege']} -> {db_emp.privileges}")
-                    if not db_emp.is_active:
-                        changes.append("wyczyszczono dane dostępowe (pracownik nieaktywny)")
                     
                     changes_details.append({
                         "employee": db_emp.name,
