@@ -32,7 +32,7 @@ class SyncService:
             terminal_employees = zkteco_service.get_all_employees()
             
             # Pobierz pracowników z bazy danych
-            db_employees = EmployeeService.get_all_active_employees(db)
+            db_employees = EmployeeService.get_all_employees(db)
             
             # Mapowanie pracowników
             terminal_emp_map = {str(emp['enrollNumber']): emp for emp in terminal_employees}
@@ -63,6 +63,12 @@ class SyncService:
             for db_emp in db_employees:
                 terminal_emp = terminal_emp_map.get(str(db_emp.enroll_number))
                 
+                # Jeśli pracownik jest nieaktywny, wyczyść jego dane dostępowe w obiekcie
+                if not db_emp.is_active:
+                    db_emp.card_number = None
+                    db_emp.password = None
+                
+                # Zawsze dodaj pracownika do synchronizacji jeśli go nie ma w terminalu
                 if not terminal_emp:
                     employees_to_sync.append(db_emp)
                     changes_details.append({
@@ -71,11 +77,13 @@ class SyncService:
                         "type": "add",
                         "message": "Dodano nowego pracownika do terminala"
                     })
+                # Lub jeśli którekolwiek z jego danych się zmieniły
                 elif (
                     terminal_emp['name'] != db_emp.name or
                     terminal_emp['cardNumber'] != db_emp.card_number or
                     terminal_emp['enabled'] != db_emp.is_active or
-                    terminal_emp['privilege'] != db_emp.privileges
+                    terminal_emp['privilege'] != db_emp.privileges or
+                    not db_emp.is_active  # Dodaj do synchronizacji zawsze gdy pracownik jest nieaktywny
                 ):
                     employees_to_sync.append(db_emp)
                     changes = []
@@ -87,6 +95,8 @@ class SyncService:
                         changes.append(f"status: {terminal_emp['enabled']} -> {db_emp.is_active}")
                     if terminal_emp['privilege'] != db_emp.privileges:
                         changes.append(f"uprawnienia: {terminal_emp['privilege']} -> {db_emp.privileges}")
+                    if not db_emp.is_active:
+                        changes.append("wyczyszczono dane dostępowe (pracownik nieaktywny)")
                     
                     changes_details.append({
                         "employee": db_emp.name,
@@ -104,6 +114,9 @@ class SyncService:
                     'message': 'Brak pracowników do synchronizacji',
                     'updated_count': 0
                 }
+            
+            # Zapisz zmiany w bazie danych
+            db.commit()
             
             return {
                 'terminal_id': terminal_id,

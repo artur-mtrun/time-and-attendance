@@ -177,9 +177,16 @@ class EmployeeService:
         zkteco_service = ZKTecoService(self.db)
         return zkteco_service.get_all_employees()
 
-    def get_all_employees(self):
-        """Pobiera pracowników z bazy danych"""
-        return self.get_employees(self.db) 
+    @staticmethod
+    def get_all_employees(db: Session):
+        """Pobiera wszystkich pracowników z bazy danych"""
+        try:
+            employees = db.query(Employee).all()
+            logger.debug(f"Pobrano {len(employees)} pracowników")
+            return employees
+        except Exception as e:
+            logger.error(f"Błąd podczas pobierania pracowników: {str(e)}", exc_info=True)
+            raise Exception(f"Błąd podczas pobierania pracowników: {str(e)}")
 
     @staticmethod
     def get_active_employees(db: Session):
