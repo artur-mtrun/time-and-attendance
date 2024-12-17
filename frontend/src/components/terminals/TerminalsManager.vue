@@ -134,6 +134,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
+import { onBeforeRouteLeave } from 'vue-router';
 import { useTerminalsStore } from '@/stores/terminals';
 import type { Terminal, SyncResult, SyncChange } from '@/types/terminal';
 import TerminalsList from '@/components/terminals/TerminalsList.vue';
@@ -141,6 +142,7 @@ import TerminalModal from '@/components/terminals/TerminalModal.vue';
 import DeleteConfirmationModal from '@/components/terminals/DeleteConfirmationModal.vue';
 import TerminalsDashboard from '@/components/terminals/TerminalsDashboard.vue';
 import SyncResultModal from './SyncResultModal.vue';
+import { useRouter } from 'vue-router';
 
 const emit = defineEmits<{
   alert: [message: string, type: 'error' | 'success' | 'warning']
@@ -163,6 +165,8 @@ const formData = ref({
 const selectedTerminalIds = ref<number[]>([]);
 const syncingTerminals = ref<number[]>([]);
 const syncResultMessage = ref('');
+
+const router = useRouter();
 
 async function loadTerminals() {
   loading.value = true;
@@ -192,36 +196,39 @@ async function handleSubmit() {
 }
 
 async function syncTerminal(terminal: Terminal) {
+  if (terminalsStore.isSyncing) return;
+  
   syncingTerminal.value = terminal.id;
   try {
     const result = await terminalsStore.syncTerminal(terminal.id);
-    console.log('Raw sync result:', result);
     
-    const stats = result.stats;
-    let detailMessage = `Synchronizacja terminala "${stats.terminal_name}":\n`;
-    detailMessage += `Zsynchronizowano ${stats.synced_employees} z ${stats.total_employees} pracowników\n\n`;
-    
-    if (stats.changes && stats.changes.length > 0) {
-      stats.changes.forEach((change: SyncChange) => {
-        if (change.type === 'add') {
-          detailMessage += `➕ ${change.employee} (${change.enroll_number}): ${change.message}\n`;
-        } else if (change.type === 'update') {
-          detailMessage += `📝 ${change.employee} (${change.enroll_number}):\n`;
-          change.changes?.forEach(changeDetail => {
-            detailMessage += `   - ${changeDetail}\n`;
-          });
-        } else if (change.type === 'delete') {
-          detailMessage += `❌ ${change.employee} (${change.enroll_number}): ${change.message}\n`;
-        }
-      });
-    } else {
-      detailMessage += "Brak zmian do synchronizacji";
+    if (syncingTerminal.value === terminal.id) {
+      const stats = result.stats;
+      let detailMessage = `Synchronizacja terminala "${stats.terminal_name}":\n`;
+      detailMessage += `Zsynchronizowano ${stats.synced_employees} z ${stats.total_employees} pracowników\n\n`;
+      
+      if (stats.changes && stats.changes.length > 0) {
+        stats.changes.forEach((change: SyncChange) => {
+          if (change.type === 'add') {
+            detailMessage += `➕ ${change.employee} (${change.enroll_number}): ${change.message}\n`;
+          } else if (change.type === 'update') {
+            detailMessage += `📝 ${change.employee} (${change.enroll_number}):\n`;
+            change.changes?.forEach(changeDetail => {
+              detailMessage += `   - ${changeDetail}\n`;
+            });
+          } else if (change.type === 'delete') {
+            detailMessage += `❌ ${change.employee} (${change.enroll_number}): ${change.message}\n`;
+          }
+        });
+      } else {
+        detailMessage += "Brak zmian do synchronizacji";
+      }
+      
+      syncResultMessage.value = detailMessage;
     }
-    
-    syncResultMessage.value = detailMessage;
   } catch (error: any) {
     console.error('Sync error:', error);
-    syncResultMessage.value = `Błąd synchronizacji terminala "${terminal.name}": ${error.response?.data?.detail || error.message}`;
+    emit('alert', `Błąd synchronizacji terminala "${terminal.name}": ${error.response?.data?.detail || error.message}`, 'error');
   } finally {
     syncingTerminal.value = null;
   }
@@ -329,6 +336,19 @@ function confirmDeleteSelected() {
 
 onMounted(() => {
     loadTerminals();
+});
+
+// Dodajemy hook onBeforeRouteLeave
+onBeforeRouteLeave((to, from, next) => {
+  if (terminalsStore.isSyncing) {
+    if (confirm('Trwa synchronizacja. Czy na pewno chcesz opuścić stronę?')) {
+      next();
+    } else {
+      next(false);
+    }
+  } else {
+    next();
+  }
 });
 
 // Reszta metod pozostaje bez zmian

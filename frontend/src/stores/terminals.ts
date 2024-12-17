@@ -8,6 +8,7 @@ export const useTerminalsStore = defineStore('terminals', () => {
     const terminals = ref<Terminal[]>([]);
     const loading = ref(false);
     const error = ref<string | null>(null);
+    const isSyncing = ref(false);
 
     async function fetchTerminals() {
         try {
@@ -68,10 +69,13 @@ export const useTerminalsStore = defineStore('terminals', () => {
     }
 
     async function syncTerminal(id: number): Promise<SyncResult> {
+        isSyncing.value = true;
         try {
             return await terminalService.syncTerminal(id);
         } catch (error) {
             throw error;
+        } finally {
+            isSyncing.value = false;
         }
     }
 
@@ -95,6 +99,7 @@ export const useTerminalsStore = defineStore('terminals', () => {
         updateTerminal,
         deleteTerminal,
         syncTerminal,
-        fetchActiveTerminals
+        fetchActiveTerminals,
+        isSyncing,
     };
 }); 
