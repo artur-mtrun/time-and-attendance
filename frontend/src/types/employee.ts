@@ -15,8 +15,8 @@ export interface CreateEmployeeData {
     name: string;
     password?: string;
     card_number?: string;
-    privileges?: number;
-    is_active?: boolean;
+    privileges: number;
+    is_active: boolean;
 }
 
 export interface UpdateEmployeeData {

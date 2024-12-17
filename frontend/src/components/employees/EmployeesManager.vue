@@ -12,6 +12,7 @@
         :employees="employeesStore.employees"
         @edit="editEmployee"
         @delete="confirmDelete"
+        @release="releaseEmployee"
         @selection-change="handleSelectionChange"
       />
   
@@ -39,7 +40,7 @@ import EmployeesDashboard from './EmployeesDashboard.vue';
 import EmployeesList from './EmployeesList.vue';
 import EmployeeModal from './EmployeeModal.vue';
 import DeleteConfirmationModal from '@/components/employees/DeleteConfirmationModal.vue';
-import type { Employee } from '@/types/employee';
+import type { Employee, CreateEmployeeData } from '@/types/employee';
 
 const emit = defineEmits<{
   alert: [message: string, type: 'error' | 'success' | 'warning']
@@ -51,10 +52,12 @@ const showCreateModal = ref(false);
 const editedEmployee = ref<Employee | null>(null);
 const employeeToDelete = ref<Employee | null>(null);
 const selectedEmployeeIds = ref<number[]>([]);
-const formData = ref({
+const formData = ref<CreateEmployeeData>({
   name: '',
   enroll_number: '',
   card_number: '',
+  password: '',
+  privileges: 0,
   is_active: true
 });
 
@@ -92,18 +95,22 @@ function closeModal() {
     name: '',
     enroll_number: '',
     card_number: '',
+    password: '',
+    privileges: 0,
     is_active: true
   };
 }
 
 function editEmployee(employee: Employee) {
-  editedEmployee.value = employee;
   formData.value = {
     name: employee.name,
     enroll_number: employee.enroll_number ?? '',
     card_number: employee.card_number ?? '',
+    password: employee.password ?? '',
+    privileges: Number(employee.privileges),
     is_active: employee.is_active
   };
+  editedEmployee.value = employee;
   showCreateModal.value = true;
 }
 
@@ -143,6 +150,21 @@ const syncSelectedEmployees = async () => {
 const confirmDeleteSelected = () => {
   // Implementacja usuwania zaznaczonych
 };
+
+async function releaseEmployee(employee: Employee) {
+  try {
+    await employeesStore.updateEmployee(employee.id, {
+      ...employee,
+      card_number: '0',
+      password: '',
+      is_active: false
+    });
+    emit('alert', 'Pracownik został zwolniony', 'success');
+    await loadEmployees();
+  } catch (error: any) {
+    emit('alert', error.response?.data?.detail || 'Wystąpił błąd podczas zwalniania pracownika', 'error');
+  }
+}
 
 onMounted(() => {
   loadEmployees();

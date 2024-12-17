@@ -25,6 +25,8 @@
           <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nr ewidencyjny</th>
           <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Imię i nazwisko</th>
           <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Karta</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">PIN</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Uprawnienia</th>
           <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
           <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Akcje</th>
         </tr>
@@ -42,9 +44,33 @@
           </td>
           <td class="px-6 py-4 whitespace-nowrap">{{ employee.enroll_number }}</td>
           <td class="px-6 py-4 whitespace-nowrap">{{ employee.name }}</td>
-          <td class="px-6 py-4 whitespace-nowrap">{{ employee.card_number }}</td>
           <td class="px-6 py-4 whitespace-nowrap">
-            <span :class="employee.is_active ? 'text-green-600' : 'text-red-600'">
+            <span 
+              :class="employee.card_number === '0' 
+                ? 'bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-medium' 
+                : ''"
+            >
+              {{ employee.card_number === '0' ? 'Brak karty' : (employee.card_number || '-') }}
+            </span>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">{{ employee.password || '-' }}</td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span :class="{
+              'px-2 py-1 rounded-full text-xs font-medium': true,
+              'bg-gray-100 text-gray-800': employee.privileges === 0,
+              'bg-blue-100 text-blue-800': employee.privileges === 1,
+              'bg-green-100 text-green-800': employee.privileges === 2,
+              'bg-purple-100 text-purple-800': employee.privileges === 3
+            }">
+              {{ privilegesMap[employee.privileges] }}
+            </span>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span 
+              :class="employee.is_active 
+                ? 'bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium'
+                : 'bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-medium'"
+            >
               {{ employee.is_active ? 'Aktywny' : 'Nieaktywny' }}
             </span>
           </td>
@@ -55,6 +81,12 @@
                 class="bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded text-sm"
               >
                 Edytuj
+              </button>
+              <button
+                @click="$emit('release', employee)"
+                class="bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 rounded text-sm"
+              >
+                Zwolnij
               </button>
               <button
                 @click="$emit('delete', employee)"
@@ -124,6 +156,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   edit: [employee: Employee];
   delete: [employee: Employee];
+  release: [employee: Employee];
   'selection-change': [selectedIds: number[]];
 }>();
 
@@ -131,6 +164,13 @@ const searchQuery = ref('');
 const currentPage = ref(1);
 const itemsPerPage = ref(20);
 const selectedEmployees = ref<number[]>([]);
+
+const privilegesMap: Record<number, string> = {
+  0: 'Użytkownik',
+  1: 'Register',
+  2: 'SysAdmin',
+  3: 'Superadmin'
+};
 
 // Filtrowanie pracowników
 const filteredEmployees = computed(() => {
