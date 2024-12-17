@@ -3,7 +3,6 @@ import router from '../router/index.js';
 
 const instance = axios.create({
     baseURL: 'http://localhost:8000',
-    timeout: 10000,
     headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
@@ -46,8 +45,8 @@ instance.interceptors.response.use(
         // Obsługa błędu 401 Unauthorized
         if (error.response && error.response.status === 401) {
             console.log('Unauthorized - clearing token and redirecting to login');
-            localStorage.removeItem('token'); // Wyczyść token
-            router.push('/login'); // Przekieruj do strony logowania
+            localStorage.removeItem('token');
+            router.push('/login');
         }
 
         return Promise.reject(error);

@@ -16,9 +16,35 @@ class ZKTecoService:
     def __init__(self, db: Session):
         self.base_url = settings.ZKTECO_API_URL
         self.db = db
-        self.timeout = 5  # 5 sekund timeoutu
+        self.request_timeout = 5  # timeout dla pojedynczego żądania
         logger.debug(f"Inicjalizacja ZKTecoService z URL: {self.base_url}")
         
+    def _make_request(self, endpoint: str, payload: Dict) -> Any:
+        """
+        Pomocnicza metoda do wykonywania żądań HTTP z obsługą błędów
+        """
+        try:
+            response = requests.post(
+                f"{self.base_url}/api/{endpoint}",
+                json=payload,
+                timeout=self.request_timeout
+            )
+            
+            if response.status_code != 200:
+                raise Exception(f"Błąd API ZKTeco: {response.text}")
+                
+            return response.json()
+            
+        except Timeout:
+            logger.error(f"Timeout podczas połączenia z czytnikiem dla endpointu {endpoint}")
+            raise Exception(f"Timeout podczas połączenia z czytnikiem")
+        except ConnectionError:
+            logger.error(f"Błąd połączenia z czytnikiem dla endpointu {endpoint}")
+            raise Exception(f"Nie można połączyć się z czytnikiem")
+        except Exception as e:
+            logger.error(f"Nieoczekiwany błąd dla endpointu {endpoint}: {str(e)}")
+            raise
+
     def get_all_employees(self) -> List[Dict[Any, Any]]:
         """Pobiera wszystkich pracowników z API ZKTeco"""
         try:
@@ -40,7 +66,7 @@ class ZKTecoService:
             response = requests.post(
                 f"{self.base_url}/api/Employee/get-all",
                 json=device_request,
-                timeout=self.timeout  # dodajemy timeout
+                timeout=self.request_timeout  # dodajemy timeout
             )
             
             logger.debug(f"Status odpowiedzi: {response.status_code}")
@@ -101,7 +127,7 @@ class ZKTecoService:
                 response = requests.post(
                     f"{self.base_url}/api/Employee/save",
                     json=payload,
-                    timeout=self.timeout
+                    timeout=self.request_timeout
                 )
                 
                 logger.debug(f"Status odpowiedzi: {response.status_code}")
@@ -142,7 +168,7 @@ class ZKTecoService:
             response = requests.post(
                 f"{self.base_url}/api/Attendance/get-all-logs",
                 json=device_request,
-                timeout=self.timeout
+                timeout=self.request_timeout
             )
             
             logger.debug(f"Status odpowiedzi: {response.status_code}")
@@ -187,7 +213,6 @@ class ZKTecoService:
         try:
             logger.info(f"Wysyłanie grupy pracowników do terminala: IP={terminal.ip_address}, Port={terminal.port}")
             
-            # Przygotuj payload dla batch request
             employees_data = [{
                 'enrollNumber': str(emp.enroll_number),
                 'name': emp.name,
@@ -206,14 +231,7 @@ class ZKTecoService:
             
             logger.debug(f"Wysyłam batch request do API ZKTeco: {payload}")
             
-            response = requests.post(
-                f"{self.base_url}/api/Employee/save-batch",
-                json=payload,
-                timeout=self.timeout
-            )
-            
-            if response.status_code != 200:
-                raise Exception(f"Błąd API ZKTeco podczas batch save: {response.text}")
+            response = self._make_request('Employee/save-batch', payload)
             
             return {
                 'status': 'success',
@@ -240,7 +258,7 @@ class ZKTecoService:
             response = requests.post(
                 f"{self.base_url}/api/Employee/delete",
                 json=payload,
-                timeout=self.timeout
+                timeout=self.request_timeout
             )
             
             if response.status_code != 200:

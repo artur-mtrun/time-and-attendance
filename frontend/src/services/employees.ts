@@ -26,7 +26,11 @@ export const employeeService = {
     },
 
     async deleteEmployee(id: number): Promise<void> {
-        await axios.delete(`/api/employees/${id}`);
+        try {
+            await axios.delete(`/api/employees/${id}`);
+        } catch (error: any) {
+            throw error;
+        }
     },
 
     async fetchFromMainTerminal(): Promise<Employee[]> {

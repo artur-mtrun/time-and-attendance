@@ -58,7 +58,6 @@ class SyncService:
             
             # Znajdź pracowników do zaktualizowania/dodania
             employees_to_sync = []
-            changes_details = []  # Szczegółowe informacje o zmianach
             
             for db_emp in db_employees:
                 terminal_emp = terminal_emp_map.get(str(db_emp.enroll_number))
